@@ -9,6 +9,7 @@
 
 #include "common/util.h"
 #include "selfdrive/ui/sunnypilot/qt/widgets/controls.h"
+#include "selfdrive/ui/sunnypilot/qt/offroad/settings/sunnypilot/lane_change_settings.h"
 
 SunnypilotPanel::SunnypilotPanel(SettingsWindowSP *parent) : QFrame(parent) {
   main_layout = new QStackedLayout(this);
@@ -42,6 +43,23 @@ SunnypilotPanel::SunnypilotPanel(SettingsWindowSP *parent) : QFrame(parent) {
   });
   list->addItem(madsSettingsButton);
 
+  // list->add
+  // Lane Change Settings
+  laneChangeSettingsButton = new PushButtonSP(tr("Customize Lane Change"));
+  laneChangeSettingsButton->setObjectName("lane_change_btn");
+  connect(laneChangeSettingsButton, &QPushButton::clicked, [=]() {
+    sunnypilotScroller->setLastScrollPosition();
+    main_layout->setCurrentWidget(laneChangeSettingsWidget);
+  });
+
+  laneChangeSettingsWidget = new LaneChangeSettings(this);
+  connect(laneChangeSettingsWidget, &LaneChangeSettings::backPress, [=]() {
+    sunnypilotScroller->restoreScrollPosition();
+    main_layout->setCurrentWidget(sunnypilotScreen);
+  });
+  list->addItem(horizontal_line());
+  list->addItem(laneChangeSettingsButton);
+
   toggleOffroadOnly = {
     madsToggle,
   };
@@ -52,6 +70,7 @@ SunnypilotPanel::SunnypilotPanel(SettingsWindowSP *parent) : QFrame(parent) {
 
   main_layout->addWidget(sunnypilotScreen);
   main_layout->addWidget(madsWidget);
+  main_layout->addWidget(laneChangeSettingsWidget);
 
   setStyleSheet(R"(
     #back_btn {

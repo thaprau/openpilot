@@ -232,6 +232,13 @@ std::unordered_map<std::string, uint32_t> keys = {
     {"HyundaiRadarTracksPersistent", PERSISTENT},
     {"HyundaiRadarTracksToggle", PERSISTENT},
 
+    // lane change settings
+    {"AutoLaneChangeTimer", PERSISTENT | BACKUP},
+    {"AutoLaneChangeBsmDelay", PERSISTENT | BACKUP},
+    {"BelowSpeedPause", PERSISTENT | BACKUP},
+    {"RoadEdge", PERSISTENT | BACKUP},
+    {"PauseLateralSpeed", PERSISTENT | BACKUP},
+
     {"DynamicExperimentalControl", PERSISTENT},
 };
 

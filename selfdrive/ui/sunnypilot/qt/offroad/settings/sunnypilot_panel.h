@@ -15,6 +15,7 @@
 #include "selfdrive/ui/qt/util.h"
 #include "selfdrive/ui/sunnypilot/qt/offroad/settings/settings.h"
 #include "selfdrive/ui/sunnypilot/qt/widgets/scrollview.h"
+#include "selfdrive/ui/sunnypilot/qt/offroad/settings/sunnypilot/lane_change_settings.h"
 
 class SunnypilotPanel : public QFrame {
   Q_OBJECT
@@ -35,6 +36,7 @@ private:
   bool offroad;
 
   ParamControl *madsToggle;
-  PushButtonSP *madsSettingsButton;
+  PushButtonSP *madsSettingsButton, *laneChangeSettingsButton;
   MadsSettings *madsWidget = nullptr;
+  LaneChangeSettings *laneChangeSettingsWidget = nullptr;
 };
