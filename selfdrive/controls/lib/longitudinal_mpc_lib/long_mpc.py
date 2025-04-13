@@ -10,9 +10,8 @@ from openpilot.common.swaglog import cloudlog
 from openpilot.selfdrive.modeld.constants import index_function
 from openpilot.selfdrive.controls.radard import _LEAD_ACCEL_TAU
 
-#from openpilot.sunnypilot.selfdrive.controls.lib.accel_personality.accel_controller import AccelController
-#from openpilot.sunnypilot.selfdrive.controls.lib.dynamic_personality.dynamic_personality_controller import DynamicPersonalityController
-from openpilot.sunnypilot.selfdrive.controls.lib.vibe_personality.vibe_personality import VibePersonalityController
+from openpilot.sunnypilot.selfdrive.controls.lib.accel_personality.accel_controller import AccelController
+
 
 if __name__ == '__main__':  # generating code
   from openpilot.third_party.acados.acados_template import AcadosModel, AcadosOcp, AcadosOcpSolver
@@ -68,18 +67,18 @@ def get_jerk_factor(personality=log.LongitudinalPersonality.standard):
   elif personality==log.LongitudinalPersonality.standard:
     return 1.0
   elif personality==log.LongitudinalPersonality.aggressive:
-    return 0.6
+    return 0.22
   else:
     raise NotImplementedError("Longitudinal personality not supported")
 
 
 def get_T_FOLLOW(personality=log.LongitudinalPersonality.standard):
   if personality==log.LongitudinalPersonality.relaxed:
-    return 1.80
+    return 1.70
   elif personality==log.LongitudinalPersonality.standard:
-    return 1.50
+    return 1.47
   elif personality==log.LongitudinalPersonality.aggressive:
-    return 1.20
+    return 1.05
   else:
     raise NotImplementedError("Longitudinal personality not supported")
 
@@ -232,9 +231,7 @@ class LongitudinalMpc:
     self.solver = AcadosOcpSolverCython(MODEL_NAME, ACADOS_SOLVER_TYPE, N)
     self.reset()
     self.source = SOURCES[2]
-    #self.accel_controller = AccelController()
-    #self.dynamic_personality_controller = DynamicPersonalityController()
-    self.vibe_controller = VibePersonalityController()
+    self.accel_controller = AccelController()
 
   def reset(self):
     # self.solver = AcadosOcpSolverCython(MODEL_NAME, ACADOS_SOLVER_TYPE, N)
@@ -335,33 +332,11 @@ class LongitudinalMpc:
     return lead_xv
 
   def update(self, radarstate, v_cruise, x, v, a, j, personality=log.LongitudinalPersonality.standard):
+    t_follow = get_T_FOLLOW(personality)
     v_ego = self.x0[1]
-
-    # Get following distance
-    if self.vibe_controller.is_follow_enabled():
-      t_follow = self.vibe_controller.get_follow_distance_multiplier(v_ego)
-      print(f"[MPC DYNAMIC ___________] Using DYNAMIC t_follow: {t_follow:.3f}s (from vibe controller)")
-    else:
-      t_follow = get_T_FOLLOW(personality)
-      print(f"[MPC STATIC ___________] Using STATIC t_follow: {t_follow:.3f}s (disabled personality)")
-
     self.status = radarstate.leadOne.status or radarstate.leadTwo.status
 
-    # Get acceleration limits
-    if self.vibe_controller.is_accel_enabled():
-      accel_limits = self.vibe_controller.get_accel_limits(v_ego)
-      if accel_limits is not None:
-        min_accel = accel_limits[0]
-        print(f"[MPC DYNAMIC ----------] Using DYNAMIC accel limits: {min_accel:.3f} m/s² (from vibe controller)")
-      else:
-        min_accel = CRUISE_MIN_ACCEL
-        print(f"[MPC STATIC ----------] Using STATIC accel limits: {min_accel:.3f} m/s² (fallback to stock behavior)")
-    else:
-      min_accel = CRUISE_MIN_ACCEL
-      print(f"[MPC STATIC ----------] Using STATIC accel limits: {min_accel:.3f} m/s² (disabled min accel limit)")
-
-    a_cruise_min = min_accel
-    # You might also want to use max_accel somewhere in your MPC constraints
+    a_cruise_min = self.accel_controller._get_min_accel_for_speed(v_ego)
 
     lead_xv_0 = self.process_lead(radarstate.leadOne)
     lead_xv_1 = self.process_lead(radarstate.leadTwo)
