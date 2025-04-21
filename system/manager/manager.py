@@ -56,6 +56,7 @@ def manager_init() -> None:
     ("CustomAccShortPressIncrement", "1"),
     ("DeviceBootMode", "0"),
     ("DynamicExperimentalControl", "0"),
+    ("DynamicPersonality", "0"),
     ("HyundaiLongitudinalTuning", "0"),
     ("LagdToggle", "1"),
     ("Mads", "1"),
