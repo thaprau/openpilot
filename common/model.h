@@ -1,1 +1,1 @@
-#define DEFAULT_MODEL "Filet o Fish (Default)"
+#define DEFAULT_MODEL "tr7 (Default)"
