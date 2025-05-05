@@ -37,7 +37,7 @@ def get_model_path():
     return {ModelRunner.ONNX: Path(__file__).parent / '../models/supercombo.onnx'}
 
   if model := _get_model():
-    return {ModelRunner.THNEED: f"{CUSTOM_MODEL_PATH}/{model.fileName}"}
+    return {ModelRunner.THNEED: f"{CUSTOM_MODEL_PATH}/{model.metadata.fileName}"}
 
   return {ModelRunner.THNEED: Path(__file__).parent / '../models/supercombo.thneed'}
 
