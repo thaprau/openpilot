@@ -14,4 +14,14 @@ class LongitudinalPanel : public QWidget {
 
 public:
   explicit LongitudinalPanel(QWidget *parent = nullptr);
+  void showEvent(QShowEvent *event) override;
+
+private:
+  bool offroad = false;
+  Params params;
+  ListWidgetSP *listWidget = nullptr;
+  ParamControl* experimentalLongitudinalToggle;
+
+private slots:
+  void updateToggles(bool _offroad);
 };

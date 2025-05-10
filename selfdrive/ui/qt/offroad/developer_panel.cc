@@ -43,7 +43,9 @@ DeveloperPanel::DeveloperPanel(SettingsWindow *parent) : ListWidget(parent) {
   QObject::connect(experimentalLongitudinalToggle, &ParamControl::toggleFlipped, [=]() {
     updateToggles(offroad);
   });
+#ifndef SUNNYPILOT
   addItem(experimentalLongitudinalToggle);
+#endif
 
   // TODO-SP: Move to Vehicles panel when ported back
   hyundaiRadarTracksToggle = new ParamControl(
