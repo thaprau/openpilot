@@ -4,6 +4,7 @@
  * This file is part of sunnypilot and is licensed under the MIT License.
  * See the LICENSE.md file in the root directory for more details.
  */
+#include <QPainterPath>
 
 #include "selfdrive/ui/sunnypilot/qt/onroad/model.h"
 
@@ -133,4 +134,81 @@ void ModelRendererSP::drawPath(QPainter &painter, const cereal::ModelDataV2::Rea
 
   painter.setBrush(bg);
   painter.drawPolygon(track_vertices);
+}
+
+void ModelRendererSP::drawLead(QPainter &painter, const cereal::RadarState::LeadData::Reader &lead_data,
+                             const QPointF &vd, const QRect &surface_rect) {
+  const float speedBuff = 10.;
+  const float leadBuff = 40.;
+  const float d_rel = lead_data.getDRel();
+  const float v_rel = lead_data.getVRel();
+
+  float fillAlpha = 0;
+  if (d_rel < leadBuff) {
+    fillAlpha = 255 * (1.0 - (d_rel / leadBuff));
+    if (v_rel < 0) {
+      fillAlpha += 255 * (-1 * (v_rel / speedBuff));
+    }
+    fillAlpha = (int)(fmin(fillAlpha, 255));
+  }
+
+  float sz = std::clamp((25 * 30) / (d_rel / 3 + 30), 15.0f, 30.0f) * 2.35;
+  float raw_x = std::clamp<float>(vd.x(), 0.f, surface_rect.width() - sz / 2);
+  float y = std::min<float>(vd.y(), surface_rect.height() - sz * 0.6);
+
+  float x_delta = std::abs(raw_x - hysteretic_x);
+  float threshold = 100.0f;
+
+  if (x_delta > threshold) {
+    hysteretic_x = raw_x; // For large changes, use raw value
+  } else {
+    hysteretic_x = (hysteresis_factor * raw_x) + ((1.0f - hysteresis_factor) * hysteretic_x); // For small changes, apply hysteresis
+  }
+
+  float x = raw_x;
+  if (params.getBool("ChevronHysteresis")) {
+    x = hysteretic_x;
+  }
+
+  if (params.getBool("ChevronMinimal")) {
+    // Set up the pen for drawing
+    QPen pen;
+    pen.setCapStyle(Qt::RoundCap);  // Round ends of the line
+    pen.setJoinStyle(Qt::RoundJoin);  // Round corners
+
+    // Disable fill
+    painter.setBrush(Qt::NoBrush);
+
+
+    // Draw the outer glow effect
+    pen.setColor(QColor(218, 202, 37, 255));  // Yellow glow color
+    pen.setWidth(10);  // Thicker width for glow
+    painter.setPen(pen);
+
+    // Create path for the line
+    QPainterPath path;
+    path.moveTo(x + (sz * 1.35), y + sz);   // right point
+    path.lineTo(x, y); // top point
+    path.lineTo(x - (sz * 1.35), y + sz);  // left point
+
+    painter.drawPath(path);  // Draw the glow
+
+    // Draw the main line
+    pen.setColor(QColor(201, 34, 49, fillAlpha));  // Red color with calculated opacity
+    pen.setWidth(7);  // Slightly thinner than the glow
+    painter.setPen(pen);
+    painter.drawPath(path);  // Draw the main line
+  } else {
+    float g_xo = sz / 5;
+    float g_yo = sz / 10;
+
+    QPointF glow[] = {{x + (sz * 1.35) + g_xo, y + sz + g_yo}, {x, y - g_yo}, {x - (sz * 1.35) - g_xo, y + sz + g_yo}};
+    painter.setBrush(QColor(218, 202, 37, 255));
+    painter.drawPolygon(glow, std::size(glow));
+
+    // chevron
+    QPointF chevron[] = {{x + (sz * 1.25), y + sz}, {x, y}, {x - (sz * 1.25), y + sz}};
+    painter.setBrush(QColor(201, 34, 49, fillAlpha));
+    painter.drawPolygon(chevron, std::size(chevron));
+  }
 }

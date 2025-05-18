@@ -128,6 +128,8 @@ inline static std::unordered_map<std::string, uint32_t> keys = {
     {"CarParamsSPCache", CLEAR_ON_MANAGER_START},
     {"CarParamsSPPersistent", PERSISTENT},
     {"CarPlatformBundle", PERSISTENT},
+    {"ChevronHysteresis", PERSISTENT | BACKUP},
+    {"ChevronMinimal", PERSISTENT | BACKUP},
     {"EnableGithubRunner", PERSISTENT | BACKUP},
     {"MaxTimeOffroad", PERSISTENT | BACKUP},
     {"ModelRunnerTypeCache", CLEAR_ON_ONROAD_TRANSITION},
