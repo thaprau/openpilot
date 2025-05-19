@@ -7,6 +7,7 @@
 
 #pragma once
 
+#include "selfdrive/ui/sunnypilot/ui.h"
 #include "selfdrive/ui/sunnypilot/qt/offroad/settings/settings.h"
 
 class VisualsPanel : public QWidget {
@@ -15,4 +16,8 @@ class VisualsPanel : public QWidget {
 public:
  explicit VisualsPanel(QWidget *parent = nullptr);
 
+private:
+ ListWidgetSP *listWidget = nullptr;
+ ParamControlSP *minimalChevronToggle = nullptr;
+ ParamControlSP *smoothChevronToggle = nullptr;
 };
