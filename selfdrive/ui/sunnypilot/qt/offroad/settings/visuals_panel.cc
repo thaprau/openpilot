@@ -28,6 +28,20 @@ VisualsPanel::VisualsPanel(QWidget *parent) : QWidget(parent) {
       "../assets/offroad/icon_monitoring.png",
       false,
     },
+    {
+      "ChevronMinimal",
+      tr("Minimalistic Lead Indicator"),
+      tr("Use a minimalistic style for lead chevron"),
+      "",
+      false,
+    },
+    {
+      "ChevronHysteresis",
+      tr("Smoother Lead Indicator Movement"),
+      tr("Reduces jerky lead chevron movement and smoothens it out. This is purely a UI change, and has no impact on lead tracking."),
+      "",
+      false,
+    },
   };
 
   for (auto &[param, title, desc, icon, needs_restart] : toggle_defs) {
