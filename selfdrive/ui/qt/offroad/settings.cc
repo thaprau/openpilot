@@ -41,6 +41,27 @@ TogglesPanel::TogglesPanel(SettingsWindow *parent) : ListWidget(parent) {
       false,
     },
     {
+      "VibePersonalityEnabled",
+      tr("Enable vibe controller."),
+      tr("....."),
+      "../assets/offroad/icon_blank.png",
+      false,
+    },
+    {
+      "VibeAccelPersonalityEnabled",
+      tr("Enable Dynamic Accel"),
+      tr("....."),
+      "../assets/offroad/icon_blank.png",
+      false,
+    },
+    {
+      "VibeFollowPersonalityEnabled",
+      tr("Enable Dynamic Personality"),
+      tr("....."),
+      "../assets/offroad/icon_blank.png",
+      false,
+    },
+    {
       "DisengageOnAccelerator",
       tr("Disengage on Accelerator Pedal"),
       tr("When enabled, pressing the accelerator pedal will disengage sunnypilot."),
