@@ -14,6 +14,8 @@ from openpilot.sunnypilot.selfdrive.controls.lib.vibe_personality.vibe_personali
 from openpilot.sunnypilot.selfdrive.controls.lib.speed_limit_controller.speed_limit_controller import SpeedLimitController
 from openpilot.sunnypilot.selfdrive.selfdrived.events import EventsSP
 from openpilot.sunnypilot.selfdrive.controls.lib.vision_turn_controller import VisionTurnController
+from openpilot.sunnypilot.models.helpers import get_active_bundle
+
 DecState = custom.LongitudinalPlanSP.DynamicExperimentalControl.DynamicExperimentalControlState
 
 
@@ -22,10 +24,11 @@ class LongitudinalPlannerSP:
     self.events_sp = EventsSP()
 
     self.dec = DynamicExperimentalController(CP, mpc)
-    #self.accel_controller = AccelController()
     self.vibe_controller = VibePersonalityController()
     self.v_tsc = VisionTurnController(CP)
     self.slc = SpeedLimitController(CP)
+    model_bundle = get_active_bundle()
+    self.generation = model_bundle.generation if model_bundle is not None else None
 
   def get_mpc_mode(self) -> str | None:
     if not self.dec.active():
@@ -55,7 +58,6 @@ class LongitudinalPlannerSP:
 
   def update(self, sm: messaging.SubMaster) -> None:
     self.dec.update(sm)
-    #self.accel_controller.update()
     self.vibe_controller.update()
 
   def publish_longitudinal_plan_sp(self, sm: messaging.SubMaster, pm: messaging.PubMaster) -> None:
