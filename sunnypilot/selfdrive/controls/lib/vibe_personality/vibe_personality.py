@@ -14,32 +14,32 @@ LongPersonality = log.LongitudinalPersonality
 
 # Acceleration Profiles mapped to LongitudinalPersonality
 MAX_ACCEL_PROFILES = {
-  LongPersonality.relaxed:    [2.00, 2.00, 1.72, 0.83, .572, .455, .365, .32, .10],  # eco-like
+  LongPersonality.relaxed:    [1.50, 1.50, 1.245, 0.83, .572, .455, .365, .32, .10],  # eco-like
   LongPersonality.standard:   [2.00, 2.00, 1.84, 1.00, .64,  .55, .42, .37, .15],   # normal
-  LongPersonality.aggressive: [2.00, 2.00, 1.95, 1.25, .78,  .67, .50, .43, .20],   # sport-like
+  LongPersonality.aggressive: [2.00, 2.00, 1.92, 1.25, .78,  .67, .50, .43, .20],   # sport-like
 }
 MAX_ACCEL_BREAKPOINTS = [0., 7., 9., 11., 16., 20., 25., 30., 55.]
 
 MIN_ACCEL_PROFILES = {
-  LongPersonality.relaxed:    [-.071143, -.07130, -.07120, -.07155, -1.4, -1.4],  # eco-like
+  LongPersonality.relaxed:    [-.021143, -.03130, -.05120, -.07155, -1.2, -1.2],  # eco-like
   LongPersonality.standard:   [-.071143, -.07132, -.07122, -.07165, -1.5, -1.5],  # normal
-  LongPersonality.aggressive: [-.071143, -.70000, -.07124, -.07175, -1.6, -1.6],  # sport-like
+  LongPersonality.aggressive: [-.010000, -.02000, -.03000, -.07175, -1.6, -1.6],  # sport-like
 }
-MIN_ACCEL_BREAKPOINTS =       [0.,       1.2,     8.,     13.,    22.2, 40.]
+MIN_ACCEL_BREAKPOINTS =       [0.,       2.0,     8.,     13.,    22.2, 40.]
 
 # Following Distance Profiles
 FOLLOW_DISTANCE_PROFILES = {
   LongPersonality.relaxed: {
     'x_vel':  [0.,   4.9,  5.0, 19.7, 22.2, 40.],
-    'y_dist': [1.18, 1.18, 1.80, 1.80, 1.90, 1.90]
+    'y_dist': [1.10, 1.10, 1.80, 1.80, 1.90, 1.90]
   },
   LongPersonality.standard: {
     'x_vel':  [0.,   4.9,   5.,   14.,  14.5, 19.7, 22.2, 40.],
-    'y_dist': [1.18, 1.18, 1.31, 1.31, 1.37, 1.37, 1.45, 1.45]
+    'y_dist': [1.05, 1.05, 1.31, 1.31, 1.37, 1.37, 1.45, 1.45]
   },
   LongPersonality.aggressive: {
     'x_vel':  [0.,   4.9,    5.,   14.,  14.5, 19.7, 22.2, 40.],
-    'y_dist': [1.18, 1.18,  1.30, 1.30, 1.35, 1.35, 1.45, 1.45]
+    'y_dist': [1.00, 1.00,  1.30, 1.30, 1.35, 1.35, 1.45, 1.45]
   }
 }
 
@@ -121,7 +121,7 @@ class VibePersonalityController:
     next_personality = self.available_personalities[(current_idx + 1) % len(self.available_personalities)]
     self.personality = next_personality
     self.params.put(self.param_keys['personality'], str(next_personality))
-    return next_personality
+    return int(next_personality)
 
   def set_personality(self, personality: int) -> bool:
     if personality in self.available_personalities:
@@ -198,7 +198,7 @@ class VibePersonalityController:
 
   def get_current_personality(self) -> int:
     self._update_from_params()
-    return self.personality
+    return int(self.personality)
 
   def reset(self):
     self.personality = LongPersonality.standard

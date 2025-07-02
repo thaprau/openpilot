@@ -6,15 +6,13 @@ See the LICENSE.md file in the root directory for more details.
 """
 # Version = 2025-6-30
 
-import numpy as np
-
 from cereal import messaging
 from opendbc.car import structs
 from numpy import interp
 from openpilot.common.params import Params
 from openpilot.common.realtime import DT_MDL
 from openpilot.sunnypilot.selfdrive.controls.lib.dec.constants import WMACConstants
-from openpilot.selfdrive.controls.lib.longitudinal_planner import ModelConstants
+
 
 # d-e2e, from modeldata.h
 TRAJECTORY_SIZE = 33
@@ -130,7 +128,7 @@ class ModeTransitionManager:
       self.mode_confidence[mode] *= 0.98
 
   def get_mode(self) -> str:
-    return self.current_mode
+    return str(self.current_mode)
 
 
 class DynamicExperimentalController:
