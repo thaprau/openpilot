@@ -226,7 +226,4 @@ inline static std::unordered_map<std::string, uint32_t> keys = {
     {"SpeedLimitWarningType", PERSISTENT | BACKUP},
     {"SpeedLimitWarningOffsetType", PERSISTENT | BACKUP},
     {"SpeedLimitWarningValueOffset", PERSISTENT | BACKUP},
-    {"VibePersonalityEnabled", PERSISTENT},
-    {"VibeAccelPersonalityEnabled", PERSISTENT},
-    {"VibeFollowPersonalityEnabled", PERSISTENT},
 };
