@@ -1,6 +1,6 @@
 class WMACConstants:
   LEAD_WINDOW_SIZE = 6
-  LEAD_PROB = 0.45
+  LEAD_PROB = 0.4
 
   SLOW_DOWN_WINDOW_SIZE = 5
   SLOW_DOWN_PROB = 0.5
