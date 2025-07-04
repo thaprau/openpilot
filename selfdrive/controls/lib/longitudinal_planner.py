@@ -89,8 +89,8 @@ class LongitudinalPlanner(LongitudinalPlannerSP):
   @staticmethod
   def parse_model(model_msg, model_error):
     if (len(model_msg.position.x) == ModelConstants.IDX_N and
-      len(model_msg.velocity.x) == ModelConstants.IDX_N and
-      len(model_msg.acceleration.x) == ModelConstants.IDX_N):
+            len(model_msg.velocity.x) == ModelConstants.IDX_N and
+            len(model_msg.acceleration.x) == ModelConstants.IDX_N):
       x = np.interp(T_IDXS_MPC, ModelConstants.T_IDXS, model_msg.position.x) - model_error * T_IDXS_MPC
       v = np.interp(T_IDXS_MPC, ModelConstants.T_IDXS, model_msg.velocity.x) - model_error
       a = np.interp(T_IDXS_MPC, ModelConstants.T_IDXS, model_msg.acceleration.x)
@@ -138,10 +138,10 @@ class LongitudinalPlanner(LongitudinalPlannerSP):
     prev_accel_constraint = not (reset_state or sm['carState'].standstill)
 
     if self.mode == 'acc':
-      if self.vibe_controller.is_personality_enabled:
-        # Only get max acceleration from vibe controller, use default ACCEL_MIN for minimum
-        max_accel = self.vibe_controller.get_max_accel(v_ego)
-        accel_clip = [ACCEL_MIN, max_accel]
+      if self.accel_controller.is_personality_enabled:
+        max_limit = self.accel_controller._get_max_accel_for_speed(v_ego)
+        #min_limit = self.accel_controller._get_min_accel_for_speed(v_ego)
+        accel_clip = [ACCEL_MIN, max_limit]
         print(f"accel_clip: {accel_clip}")
         # Recalculate limit turn according to the new max limit
         steer_angle_without_offset = sm['carState'].steeringAngleDeg - sm['liveParameters'].angleOffsetDeg
@@ -152,16 +152,6 @@ class LongitudinalPlanner(LongitudinalPlannerSP):
         accel_clip = limit_accel_in_turns(v_ego, steer_angle_without_offset, accel_clip, self.CP)
     else:
       accel_clip = [ACCEL_MIN, ACCEL_MAX]
-
-    # Override accel using Accel Controller if enabled
-    if self.accel_controller.is_personality_enabled:
-      max_limit = self.accel_controller._get_max_accel_for_speed(v_ego)
-      if self.mpc.mode == 'acc':
-        # Use the accel controller limits directly
-        accel_clip = [ACCEL_MIN, max_limit]
-        # Recalculate limit turn according to the new max limit
-        steer_angle_without_offset = sm['carState'].steeringAngleDeg - sm['liveParameters'].angleOffsetDeg
-        accel_clip = limit_accel_in_turns(v_ego, steer_angle_without_offset, accel_clip, self.CP)
 
     if reset_state:
       self.v_desired_filter.x = v_ego
@@ -207,7 +197,7 @@ class LongitudinalPlanner(LongitudinalPlannerSP):
 
     action_t =  self.CP.longitudinalActuatorDelay + DT_MDL
     output_a_target_mpc, output_should_stop_mpc = get_accel_from_plan(self.v_desired_trajectory, self.a_desired_trajectory, CONTROL_N_T_IDX,
-                                                                        action_t=action_t, vEgoStopping=self.CP.vEgoStopping)
+                                                                      action_t=action_t, vEgoStopping=self.CP.vEgoStopping)
     output_a_target_e2e = sm['modelV2'].action.desiredAcceleration
     output_should_stop_e2e = sm['modelV2'].action.shouldStop
 

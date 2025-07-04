@@ -36,4 +36,5 @@ private:
   SpeedLimitControlSubpanel *slcScreen;
   SpeedLimitControl *slcControl;
   ParamControlSP *visionTurnSpeedControl = nullptr;
+  ParamControlSP *dynamicpersonality = nullptr;
 };

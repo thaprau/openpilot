@@ -28,7 +28,7 @@ def build(spinner: Spinner, dirty: bool = False, minimal: bool = False) -> None:
 
   if AGNOS:
     HARDWARE.set_power_save(False)
-    os.sched_setaffinity(0, range(8))  # ensure we can use the isolcpus cores
+    os.sched_setaffinity(0, range(8))  # type: ignore[attr-defined] # ensure we can use the isolcpus cores
 
   # building with all cores can result in using too
   # much memory, so retry with less parallelism

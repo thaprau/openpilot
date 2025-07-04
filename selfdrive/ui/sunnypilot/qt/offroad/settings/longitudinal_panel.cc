@@ -57,6 +57,11 @@ LongitudinalPanel::LongitudinalPanel(QWidget *parent) : QWidget(parent) {
     "../assets/offroad/icon_shell.png");
   list->addItem(visionTurnSpeedControl);
 
+  dynamicpersonality = new ParamControlSP("DynamicPersonality",
+    tr("Enable Dynamic Personality"), tr("Adjust the current follow distance dynamically "),
+    "../assets/offroad/icon_shell.png");
+  list->addItem(dynamicpersonality);
+
   connect(slcControl, &SpeedLimitControl::slcSettingsButtonClicked, [=]() {
     cruisePanelScroller->setLastScrollPosition();
     main_layout->setCurrentWidget(slcScreen);

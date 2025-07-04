@@ -9,24 +9,25 @@ import numpy as np
 
 # Profiles
 MAX_ACCEL_PROFILES = {
-  "eco":    [2.00, 1.90, 1.85, 1.52, 0.90, .59,  .48, .39, .32, .12],
-  "normal": [2.00, 1.95, 1.85, 1.70, 1.10, .75,  .61, .50, .38, .2],
-  "sport":  [2.00, 2.00, 1.98, 1.90, 1.30, 1.00, .72, .60, .48, .3],
+  "eco":                [1.50, 1.5, 1.43, 1.32, 0.83, .572, .455, .365, .32, .10],
+  "normal":             [2.00, 2.00, 1.99, 1.66, 1.04, .64,  .55, .42, .37, .15],
+  "sport":              [2.00, 2.00, 2.00, 1.95, 1.25, .78,  .67, .50, .43, .20],
 }
+MAX_ACCEL_BREAKPOINTS = [0.,   1.,   6.,   8.,   11.,  16.,  20., 25., 30., 55.]
 
 MIN_ACCEL_PROFILES = {
-  "eco":    [-0.02,  -0.004,  -0.002, -0.2, -1.0, -1.0],
-  "normal": [-0.02,  -0.005,  -0.005,  -0.3, -1.2, -1.2],
-  "sport":  [-0.1,   -1.2,   -1.2,  -1.2,  -1.2, -1.2],
-  "stock":  [-1.2,   -1.2,   -1.2,  -1.2,  -1.2, -1.2],
+  "eco":                [-.07115,  -.0713, -.072,  -.072, -1.2, -1.2],
+  "normal":             [-.07117,  -.0714, -.073,  -.073, -1.5, -1.5],
+  "sport":              [-.07119,  -.0715, -.074,  -.074, -1.6, -1.6],
+  "stock":              [-1.2,    -1.2,   -1.2,   -1.2,  -1.2, -1.2],
 }
-
-MAX_ACCEL_BREAKPOINTS = [0., 1., 6., 8., 11., 16., 20., 25., 30., 55.]
-MIN_ACCEL_BREAKPOINTS = [0.,  3.,   5.,   14.,  20., 40.]
+MIN_ACCEL_BREAKPOINTS = [0.,      1.2,    8.,     14.,   22.2,  40.]
 
 # Precompute slopes for Cubic Bézier curves
 def compute_symmetric_slopes(x, y):
   n = len(x)
+  if n < 2:
+    raise ValueError("At least two points are required to compute slopes.")
   m = np.zeros(n)
   for i in range(n):
     if i == 0:
@@ -59,7 +60,7 @@ def hermite_interpolate(x, xp, yp, slopes, mode):
 
   x0, x1 = xp[idx], xp[idx+1]
   y0, y1 = yp[idx], yp[idx+1]
-  m0, m1 = slopes[mode][idx], slopes[mode][idx]
+  m0, m1 = slopes[mode][idx], slopes[mode][idx+1]
 
   t = (x - x0) / (x1 - x0)
   h00 = 2*t**3 - 3*t**2 + 1
