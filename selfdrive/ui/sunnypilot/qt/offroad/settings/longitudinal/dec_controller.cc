@@ -60,6 +60,7 @@ DecControllerSubpanel::DecControllerSubpanel(QWidget *parent) : QWidget(parent) 
     params.put("DynamicExperimentalDistanceValue", "30");
     params.put("DynamicExperimentalSpeedBased", "0");
     params.put("DynamicExperimentalSpeedValue", "25");
+    params.put("DynamicExperimentalSlowness", "0");
 
     std::vector<ParamControlSP*> toggles = {standstillControl, modelSlowDownControl, curvatureControl, hasLeadControl, distanceBasedControl, speedBasedControl, slownessControl};
     for (auto toggle : toggles) {
@@ -101,7 +102,7 @@ DecControllerSubpanel::DecControllerSubpanel(QWidget *parent) : QWidget(parent) 
   add_toggle(modelSlowDownControl, "DynamicExperimentalModelSlowDown", tr("Model Slow Down Detection"), tr("Use blended mode when the model detects a slow down scenario ahead."), "1");
   add_toggle(curvatureControl, "DynamicExperimentalCurvature", tr("High Curvature Detection"), tr("Use blended mode when high curvature is detected in the road ahead."), "0");
   add_toggle(hasLeadControl, "DynamicExperimentalHasLead", tr("Lead Vehicle Detection"), tr("Use blended mode when a lead vehicle is detected and approaching."), "0");
-  add_toggle(slownessControl, "DynamicExperimentalSlowness", tr("Slowness Detection"), tr("Use blended mode when driving significantly slower than the cruise speed."), "1");
+  add_toggle(slownessControl, "DynamicExperimentalSlowness", tr("Slowness Detection"), tr("Use blended mode when driving significantly slower than the cruise speed."), "0");
 
   // Distance-based DEC
   add_toggle(distanceBasedControl, "DynamicExperimentalDistanceBased", tr("Distance-Based Switching"), tr("Use blended mode when the distance to the lead vehicle is below the specified threshold."), "0");
