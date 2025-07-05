@@ -11,6 +11,7 @@
 #include "selfdrive/ui/sunnypilot/qt/offroad/settings/longitudinal/custom_acc_increment.h"
 #include "selfdrive/ui/sunnypilot/qt/offroad/settings/longitudinal/slc/speed_limit_control.h"
 #include "selfdrive/ui/sunnypilot/qt/offroad/settings/longitudinal/slc/speed_limit_control_subpanel.h"
+#include "selfdrive/ui/sunnypilot/qt/offroad/settings/longitudinal/dec_controller.h"
 #include "selfdrive/ui/sunnypilot/qt/offroad/settings/settings.h"
 #include "selfdrive/ui/sunnypilot/qt/widgets/scrollview.h"
 
@@ -35,6 +36,9 @@ private:
 
   SpeedLimitControlSubpanel *slcScreen;
   SpeedLimitControl *slcControl;
+  DecControllerSubpanel *decScreen;
+  ButtonControlSP *decManageBtn = nullptr;
   ParamControlSP *visionTurnSpeedControl = nullptr;
   ParamControlSP *dynamicpersonality = nullptr;
+  ParamControlSP *dynamicExperimentalControl = nullptr;
 };

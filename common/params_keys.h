@@ -126,6 +126,7 @@ inline static std::unordered_map<std::string, uint32_t> keys = {
     {"ApiCache_DriveStats", PERSISTENT},
     {"AutoLaneChangeBsmDelay", PERSISTENT},
     {"AutoLaneChangeTimer", PERSISTENT},
+    {"BlindSpot", PERSISTENT | BACKUP},
     {"BlinkerMinLateralControlSpeed", PERSISTENT | BACKUP},
     {"BlinkerPauseLateralControl", PERSISTENT | BACKUP},
     {"CarParamsSP", CLEAR_ON_MANAGER_START | CLEAR_ON_ONROAD_TRANSITION},
@@ -191,8 +192,17 @@ inline static std::unordered_map<std::string, uint32_t> keys = {
     {"LongTuningMinUpperJerk", PERSISTENT | BACKUP},
     {"LongTuningMinLowerJerk", PERSISTENT | BACKUP},
 
-    {"DynamicExperimentalControl", PERSISTENT},
-    {"BlindSpot", PERSISTENT | BACKUP},
+    // Dynamic Experimental Controller
+    {"DynamicExperimentalControl", PERSISTENT | BACKUP},
+    {"DynamicExperimentalStandstill", PERSISTENT | BACKUP},
+    {"DynamicExperimentalModelSlowDown", PERSISTENT | BACKUP},
+    {"DynamicExperimentalCurvature", PERSISTENT | BACKUP},
+    {"DynamicExperimentalHasLead", PERSISTENT | BACKUP},
+    {"DynamicExperimentalDistanceBased", PERSISTENT | BACKUP},
+    {"DynamicExperimentalDistanceValue", PERSISTENT | BACKUP},
+    {"DynamicExperimentalSpeedBased", PERSISTENT | BACKUP},
+    {"DynamicExperimentalSpeedValue", PERSISTENT | BACKUP},
+    {"DynamicExperimentalSlowness", PERSISTENT | BACKUP},
 
     // model panel params
     {"LagdToggle", PERSISTENT | BACKUP},

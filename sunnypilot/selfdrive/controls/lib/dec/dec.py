@@ -190,6 +190,16 @@ class DynamicExperimentalController:
   def _read_params(self) -> None:
     if self._frame % int(1. / DT_MDL) == 0:
       self._enabled = self._params.get_bool("DynamicExperimentalControl")
+      self._standstill_param = self._params.get_bool("DynamicExperimentalStandstill")
+      self._model_slow_down_param = self._params.get_bool("DynamicExperimentalModelSlowDown")
+      self._curvature_param = self._params.get_bool("DynamicExperimentalCurvature")
+      self._has_lead_param = self._params.get_bool("DynamicExperimentalHasLead")
+      self._distance_based_param = self._params.get_bool("DynamicExperimentalDistanceBased")
+      self._distance_value_param = self._params.get("DynamicExperimentalDistanceValue")
+      self._speed_based_param = self._params.get_bool("DynamicExperimentalSpeedBased")
+      self._speed_value_param = self._params.get("DynamicExperimentalSpeedValue")
+      self._slowness_param = self._params.get_bool("DynamicExperimentalSlowness")
+
 
   def mode(self) -> str:
     return str(self._mode)
@@ -299,80 +309,50 @@ class DynamicExperimentalController:
     # Keep prev value for lead filtered
     self._has_lead_filtered_prev = self._has_lead_filtered
 
-  def _radarless_mode(self) -> None:
-    # Enhanced radarless mode implementation
+  def _dynamic_experimental_mode(self) -> None:
+    # Enhanced dynamic experimental mode with lead distance and acceleration consideration
 
-    # When standstill: blended
-    if self._has_standstill:
-      self._set_mode('blended')
-      return
+    # When standstill: blended if param is set
+    if self._standstill_param:
+      if self._has_standstill:
+        self._set_mode('blended')
+        return
 
     # When detecting slow down scenario: blended
-    if self._has_slow_down:
-      self._set_mode('blended')
-      return
+    if self._model_slow_down_param:
+      if self._has_slow_down:
+        self._set_mode('blended')
+        return
 
     # When high curvature is detected: use blended for better curve handling
-    if self._high_curvature and self._v_ego_kph > 45.0:
-      self._set_mode('blended')
-      return
-
-    if self._has_lead_filtered:
-      # Check distance-based conditions
-      if self._lead_dist < 20.0:
+    if self._curvature_param:
+      if self._high_curvature:
         self._set_mode('blended')
         return
-
-      if self._v_ego_kph < 26.55:
-        self._set_mode('blended')
-        return
-
-    # Car driving at speed lower than set speed: acc
-    if self._has_slowness:
-      self._set_mode('acc')
-      return
-
-    if self._has_lead_filtered:
-      if self._lead_dist < 30.0:
-        self._set_mode('blended')
-        return
-
-    # Default to acc mode
-    self._set_mode('acc')
-
-  def _radar_mode(self) -> None:
-    # Enhanced radar mode with lead distance and acceleration consideration
-
-    # When standstill: blended
-    if self._has_standstill:
-      self._set_mode('blended')
-      return
-
-    # When detecting slow down scenario or high curvature: blended
-    if self._has_slow_down:
-      self._set_mode('blended')
-      return
-
-    # When high curvature is detected: use blended for better curve handling
-    if self._high_curvature and self._v_ego_kph > 50.0:
-      self._set_mode('blended')
-      return
 
     # Advanced radar mode decision logic
     if self._has_lead_filtered:
-      # Check distance-based conditions
-      if self._lead_dist < 20.0:
+      # If distance is to lead is below threshold, use blended
+      if self._distance_based_param:
+        if self._lead_dist < float(self._distance_value_param):
+          self._set_mode('blended')
+          return
+      if self._has_lead_param:
+        if self._lead_rel_vel < -0.5:
+          self._set_mode('blended')
+          return
+
+    # Speed-based decision: if speed is below set point, use blended
+    if self._speed_based_param:
+      if self._v_ego_kph < float(self._speed_value_param):
         self._set_mode('blended')
         return
 
-      if self._v_ego_kph < 26.55:
+    # Car driving at speed lower than set speed: blended if param set
+    if self._slowness_param:
+      if self._has_slowness:
         self._set_mode('blended')
         return
-
-    # Car driving at speed lower than set speed: acc
-    if self._has_slowness:
-      self._set_mode('acc')
-      return
 
     # Default to acc mode
     self._set_mode('acc')
@@ -389,11 +369,7 @@ class DynamicExperimentalController:
   def update(self, sm: messaging.SubMaster) -> None:
     self._read_params()
     self._update_calculations(sm)
-
-    if self._CP.radarUnavailable:
-      self._radarless_mode()
-    else:
-      self._radar_mode()
+    self._dynamic_experimental_mode()
 
     self._active = sm['selfdriveState'].experimentalMode and self._enabled
     self._frame += 1

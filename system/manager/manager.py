@@ -55,7 +55,6 @@ def manager_init() -> None:
     ("CustomAccLongPressIncrement", "5"),
     ("CustomAccShortPressIncrement", "1"),
     ("DeviceBootMode", "0"),
-    ("DynamicExperimentalControl", "0"),
     ("DynamicPersonality", "0"),
     ("HyundaiLongitudinalTuning", "0"),
     ("LagdToggle", "1"),
@@ -73,6 +72,19 @@ def manager_init() -> None:
     ("QuietMode", "0"),
     ("VisionTurnSpeedControl", "0"),
 
+    # Dynamic Experimental Controller
+    ("DynamicExperimentalControl", "0"),
+    ("DynamicExperimentalStandstill", "1"),
+    ("DynamicExperimentalModelSlowDown", "1"),
+    ("DynamicExperimentalCurvature", "0"),
+    ("DynamicExperimentalHasLead", "0"),
+    ("DynamicExperimentalDistanceBased", "0"),
+    ("DynamicExperimentalDistanceValue", "30"),
+    ("DynamicExperimentalSpeedBased", "0"),
+    ("DynamicExperimentalSpeedValue", "25"),
+    ("DynamicExperimentalSlowness", "1"),
+
+    # Speed Limit Controller
     ("SpeedLimitControl", "0"),
     ("SpeedLimitControlPolicy", "3"),
     ("SpeedLimitEngageType", "0"),
