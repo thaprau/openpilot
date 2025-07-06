@@ -25,9 +25,13 @@ class LongitudinalPlannerSP:
     self.dec = DynamicExperimentalController(CP, mpc)
     self.v_tsc = VisionTurnController(CP)
     self.slc = SpeedLimitController(CP)
+    self.accel_controller = AccelController()
     model_bundle = get_active_bundle()
     self.generation = model_bundle.generation if model_bundle is not None else None
-    self.accel_controller = AccelController()
+
+  @property
+  def mlsim(self) -> bool:
+    return self.generation == 11
 
   def get_mpc_mode(self) -> str | None:
     if not self.dec.active():
