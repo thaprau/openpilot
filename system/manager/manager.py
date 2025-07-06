@@ -76,7 +76,7 @@ def manager_init() -> None:
     ("DynamicExperimentalControl", "0"),
     ("DynamicExperimentalStandstill", "1"),
     ("DynamicExperimentalModelSlowDown", "1"),
-    ("DynamicExperimentalCurvature", "0"),
+    ("DynamicExperimentalFCW", "1"),
     ("DynamicExperimentalHasLead", "0"),
     ("DynamicExperimentalDistanceBased", "0"),
     ("DynamicExperimentalDistanceValue", "30"),

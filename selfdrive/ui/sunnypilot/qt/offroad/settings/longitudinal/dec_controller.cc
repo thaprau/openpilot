@@ -54,7 +54,7 @@ DecControllerSubpanel::DecControllerSubpanel(QWidget *parent) : QWidget(parent) 
   connect(reset_btn, &QPushButton::clicked, [=]() {
     params.put("DynamicExperimentalStandstill", "1");
     params.put("DynamicExperimentalModelSlowDown", "1");
-    params.put("DynamicExperimentalCurvature", "0");
+    params.put("DynamicExperimentalFCW", "1");
     params.put("DynamicExperimentalHasLead", "0");
     params.put("DynamicExperimentalDistanceBased", "0");
     params.put("DynamicExperimentalDistanceValue", "30");
@@ -62,7 +62,7 @@ DecControllerSubpanel::DecControllerSubpanel(QWidget *parent) : QWidget(parent) 
     params.put("DynamicExperimentalSpeedValue", "25");
     params.put("DynamicExperimentalSlowness", "0");
 
-    std::vector<ParamControlSP*> toggles = {standstillControl, modelSlowDownControl, curvatureControl, hasLeadControl, distanceBasedControl, speedBasedControl, slownessControl};
+    std::vector<ParamControlSP*> toggles = {standstillControl, modelSlowDownControl, fcwControl, hasLeadControl, distanceBasedControl, speedBasedControl, slownessControl};
     for (auto toggle : toggles) {
       if (toggle) toggle->refresh();
     }
@@ -100,7 +100,7 @@ DecControllerSubpanel::DecControllerSubpanel(QWidget *parent) : QWidget(parent) 
 
   add_toggle(standstillControl, "DynamicExperimentalStandstill", tr("Enable at Standstill"), tr("Use blended mode when the vehicle is at a standstill."), "1");
   add_toggle(modelSlowDownControl, "DynamicExperimentalModelSlowDown", tr("Model Slow Down Detection"), tr("Use blended mode when the model detects a slow down scenario ahead."), "1");
-  add_toggle(curvatureControl, "DynamicExperimentalCurvature", tr("High Curvature Detection"), tr("Use blended mode when high curvature is detected in the road ahead."), "0");
+  add_toggle(fcwControl, "DynamicExperimentalFCW", tr("FCW Detection"), tr("Use blended mode when FCW is detected in the road ahead."), "1");
   add_toggle(hasLeadControl, "DynamicExperimentalHasLead", tr("Lead Vehicle Detection"), tr("Use blended mode when a lead vehicle is detected and approaching."), "0");
   add_toggle(slownessControl, "DynamicExperimentalSlowness", tr("Slowness Detection"), tr("Use blended mode when driving significantly slower than the cruise speed."), "0");
 

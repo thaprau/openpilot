@@ -29,7 +29,7 @@ private:
 
   ParamControlSP *standstillControl = nullptr;
   ParamControlSP *modelSlowDownControl = nullptr;
-  ParamControlSP *curvatureControl = nullptr;
+  ParamControlSP *fcwControl = nullptr;
   ParamControlSP *hasLeadControl = nullptr;
   ParamControlSP *distanceBasedControl = nullptr;
   ParamControlSP *speedBasedControl = nullptr;

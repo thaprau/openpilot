@@ -1,13 +1,17 @@
 class WMACConstants:
-  LEAD_WINDOW_SIZE = 6
-  LEAD_PROB = 0.35
+  # Lead detection parameters
+  LEAD_WINDOW_SIZE = 6  # Stable detection window
+  LEAD_PROB = 0.4  # Balanced threshold for lead detection
 
-  SLOW_DOWN_WINDOW_SIZE = 6
-  SLOW_DOWN_PROB = 0.5
+  # Slow down detection parameters
+  SLOW_DOWN_WINDOW_SIZE = 5  # Responsive but stable
+  SLOW_DOWN_PROB = 0.3  # Balanced threshold for slow down scenarios
 
-  SLOW_DOWN_BP =   [0.0, 16.09, 24.14, 32.19, 40.23, 48.28, 56.33, 72.42]
-  SLOW_DOWN_DIST = [32., 46.  , 64.,   86.,  108.,  130.,  145.,  165.]
+  # Optimized slow down distance curve - smooth and progressive
+  SLOW_DOWN_BP = [0., 10., 20., 30., 40., 50., 55., 60.]
+  SLOW_DOWN_DIST = [32., 46., 64., 86., 108., 130., 145., 165.]
 
-  SLOWNESS_WINDOW_SIZE = 15
-  SLOWNESS_PROB = 0.8
-  SLOWNESS_CRUISE_OFFSET = 1.10
+  # Slowness detection parameters
+  SLOWNESS_WINDOW_SIZE = 10  # Stable slowness detection
+  SLOWNESS_PROB = 0.55  # Clear threshold for slowness
+  SLOWNESS_CRUISE_OFFSET = 1.025  # Conservative cruise speed offset

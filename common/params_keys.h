@@ -196,7 +196,7 @@ inline static std::unordered_map<std::string, uint32_t> keys = {
     {"DynamicExperimentalControl", PERSISTENT | BACKUP},
     {"DynamicExperimentalStandstill", PERSISTENT | BACKUP},
     {"DynamicExperimentalModelSlowDown", PERSISTENT | BACKUP},
-    {"DynamicExperimentalCurvature", PERSISTENT | BACKUP},
+    {"DynamicExperimentalFCW", PERSISTENT | BACKUP},
     {"DynamicExperimentalHasLead", PERSISTENT | BACKUP},
     {"DynamicExperimentalDistanceBased", PERSISTENT | BACKUP},
     {"DynamicExperimentalDistanceValue", PERSISTENT | BACKUP},
