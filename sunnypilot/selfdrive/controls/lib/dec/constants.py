@@ -12,6 +12,8 @@ class WMACConstants:
   SLOW_DOWN_DIST = [32., 46., 64., 86., 108., 130., 145., 165.]
 
   # Slowness detection parameters
-  SLOWNESS_WINDOW_SIZE = 10  # Stable slowness detection
-  SLOWNESS_PROB = 0.55  # Clear threshold for slowness
+  SLOWNESS_WINDOW_SIZE = 15  # Stable slowness detection
+  SLOWNESS_PROB = 0.65  # Clear threshold for slowness
   SLOWNESS_CRUISE_OFFSET = 1.025  # Conservative cruise speed offset
+  SLOWNESS_DEFICIT_THRESHOLD = 0.25  # 25% below cruise speed to trigger
+  SLOWNESS_MIN_SPEED = 30.0  # Minimum speed to consider slowness (km/h)

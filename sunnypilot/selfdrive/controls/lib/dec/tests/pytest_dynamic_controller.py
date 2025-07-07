@@ -104,7 +104,7 @@ def test_slowdown_triggers_blended(mock_cp, mock_mpc, default_sm):
 
   # Force high urgency slowdown condition by replacing the filter
   controller._slow_down_filter = FakeSmoothKalman(value=1.0)
-  controller._urgency = 0.9  # High urgency
+  controller._urgency = 0.8
   controller._has_slow_down = True
 
   controller.update(default_sm)

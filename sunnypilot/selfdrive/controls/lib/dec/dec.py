@@ -216,6 +216,9 @@ class DynamicExperimentalController:
     lead_one = sm['radarState'].leadOne
     md = sm['modelV2']
 
+    # Store lead data for use in urgency filter
+    self._last_lead_one = lead_one if lead_one.status else None
+
     self._v_ego_kph = car_state.vEgo * 3.6
     self._v_cruise_kph = car_state.vCruise
     self._has_standstill = car_state.standstill
@@ -239,14 +242,19 @@ class DynamicExperimentalController:
     # Slow down detection
     self._calculate_slow_down(md)
 
-    # Slowness detection
+    # Slowness detection - only when significantly below cruise and not due to normal deceleration
     if not (self._standstill_count > 5) and not self._has_slow_down:
-      current_slowness = float(self._v_ego_kph <= (self._v_cruise_kph * WMACConstants.SLOWNESS_CRUISE_OFFSET))
+      speed_deficit_ratio = (self._v_cruise_kph - self._v_ego_kph) / max(self._v_cruise_kph, 1.0)
+
+      significant_deficit = speed_deficit_ratio > WMACConstants.SLOWNESS_DEFICIT_THRESHOLD
+      reasonable_speed = self._v_ego_kph > WMACConstants.SLOWNESS_MIN_SPEED
+
+      current_slowness = float(significant_deficit and reasonable_speed)
+
       self._slowness_filter.add_data(current_slowness)
       slowness_value = self._slowness_filter.get_value() or 0.0
 
-      # Hysteresis for slowness
-      threshold = WMACConstants.SLOWNESS_PROB * (0.8 if self._has_slowness else 1.1)
+      threshold = WMACConstants.SLOWNESS_PROB * (0.7 if self._has_slowness else 1.2)
       self._has_slowness = slowness_value > threshold
 
   def _calculate_slow_down(self, md):
@@ -304,6 +312,14 @@ class DynamicExperimentalController:
         speed_factor = 1.0 + (self._v_ego_kph - 25.0) / 80.0
         urgency = min(1.0, urgency * speed_factor)
 
+
+      # Reduce urgency if trajectory endpoint is close to lead distance, and trajectory endpoint is not significantly shorter than lead distance
+      if self._follow_lead_param and self._has_lead_filtered and self._last_lead_one is not None:
+        lead_distance = self._last_lead_one.dRel
+        distance_diff = abs(endpoint_x - lead_distance)
+        if distance_diff < 15.0 and endpoint_x >= (lead_distance - 10.0):
+          urgency *= 0.3
+
     # Apply filtering but with less smoothing for stops
     self._slow_down_filter.add_data(urgency)
     urgency_filtered = self._slow_down_filter.get_value() or 0.0
@@ -353,12 +369,12 @@ class DynamicExperimentalController:
         # If follow lead param is on, and we have a lead, prefer ACC unless very urgent
         if self._follow_lead_param and self._has_lead_filtered:
           if self._urgency > 0.75:
-            self._mode_manager.request_mode('blended', confidence=1.0, emergency=True)
+            self._mode_manager.request_mode('blended', confidence=1.0)
           else:
             self._mode_manager.request_mode('acc', confidence=0.7)
         else:
           # Normal logic when no lead or follow lead param is off
-          if self._urgency > 0.7:
+          if self._urgency > 0.75:
             self._mode_manager.request_mode('blended', confidence=1.0, emergency=True)
           else:
             confidence = min(1.0, self._urgency * 1.5)
@@ -372,8 +388,8 @@ class DynamicExperimentalController:
         if self._follow_lead_param:
           self._mode_manager.request_mode('acc', confidence=0.5)
         else:
-          # Normal slowness logic when no lead or follow lead param is off
-          self._mode_manager.request_mode('blended', confidence=0.15)
+          # Normal slowness logic when follow lead param is off
+          self._mode_manager.request_mode('blended', confidence=0.1)
         return
 
     # Default: ACC
