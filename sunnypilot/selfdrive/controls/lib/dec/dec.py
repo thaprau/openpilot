@@ -369,7 +369,7 @@ class DynamicExperimentalController:
     if self._slowness_param:
       if self._has_slowness and not self._has_slow_down:
         # If follow lead param is on, and we have a lead, don't trigger slowness
-        if self._follow_lead_param and self._has_lead_filtered:
+        if self._follow_lead_param:
           self._mode_manager.request_mode('acc', confidence=0.5)
         else:
           # Normal slowness logic when no lead or follow lead param is off
