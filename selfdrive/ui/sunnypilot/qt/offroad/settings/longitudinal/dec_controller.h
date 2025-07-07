@@ -1,4 +1,3 @@
-
 /**
  * Copyright (c) 2021-, Haibin Wen, sunnypilot, and a number of other contributors.
  *
@@ -18,6 +17,9 @@ class DecControllerSubpanel : public QWidget {
 public:
   explicit DecControllerSubpanel(QWidget *parent = nullptr);
 
+protected:
+  void showEvent(QShowEvent *event) override;
+
 signals:
   void backPress();
 
@@ -25,6 +27,7 @@ private slots:
   void updateToggles();
 
 private:
+  void showAllDescriptions();
   Params params;
 
   ParamControlSP *standstillControl = nullptr;
@@ -34,6 +37,7 @@ private:
   ParamControlSP *distanceBasedControl = nullptr;
   ParamControlSP *speedBasedControl = nullptr;
   ParamControlSP *slownessControl = nullptr;
+  ParamControlSP *followLeadControl = nullptr;
   OptionControlSP *distanceValueControl = nullptr;
   OptionControlSP *speedValueControl = nullptr;
 };

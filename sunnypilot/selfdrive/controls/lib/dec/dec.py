@@ -196,6 +196,7 @@ class DynamicExperimentalController:
       self._speed_based_param = self._params.get_bool("DynamicExperimentalSpeedBased")
       self._speed_value_param = self._params.get("DynamicExperimentalSpeedValue")
       self._slowness_param = self._params.get_bool("DynamicExperimentalSlowness")
+      self._follow_lead_param = self._params.get_bool("DynamicExperimentalFollowLead")
 
   def mode(self) -> str:
     return self._mode_manager.get_mode()
@@ -327,30 +328,17 @@ class DynamicExperimentalController:
         self._mode_manager.request_mode('blended', confidence=0.9)
         return
 
-    # When detecting slow down scenario: blended with emergency for high urgency
-    if self._model_slow_down_param:
-      if self._has_slow_down:
-        if self._urgency > 0.7:
-          # Emergency: immediate blended mode for high urgency stops
-          self._mode_manager.request_mode('blended', confidence=1.0, emergency=True)
-        else:
-          # Normal: blended with urgency-based confidence
-          confidence = min(1.0, self._urgency * 1.5)
-          self._mode_manager.request_mode('blended', confidence=confidence)
-        return
-
-
     # Advanced radar mode decision logic
     if self._has_lead_filtered:
       # If distance to lead is below threshold, use blended
       if self._distance_based_param:
         if lead_one.dRel < float(self._distance_value_param):
-          self._mode_manager.request_mode('blended', confidence=0.8)
+          self._mode_manager.request_mode('blended', confidence=0.9)
           return
       # If we have a lead and its speed is significantly lower, use blended
       if self._has_lead_param:
-        if  lead_one.vRel < -0.55:
-          self._mode_manager.request_mode('blended', confidence=0.8)
+        if  lead_one.vRel < -0.75:
+          self._mode_manager.request_mode('blended', confidence=0.9)
           return
 
     # Speed-based decision: if speed is below set point, use blended
@@ -359,10 +347,33 @@ class DynamicExperimentalController:
         self._mode_manager.request_mode('blended', confidence=0.8)
         return
 
+    # When detecting slow down scenario: blended with emergency for high urgency
+    if self._model_slow_down_param:
+      if self._has_slow_down:
+        # If follow lead param is on, and we have a lead, prefer ACC unless very urgent
+        if self._follow_lead_param and self._has_lead_filtered:
+          if self._urgency > 0.75:
+            self._mode_manager.request_mode('blended', confidence=1.0, emergency=True)
+          else:
+            self._mode_manager.request_mode('acc', confidence=0.7)
+        else:
+          # Normal logic when no lead or follow lead param is off
+          if self._urgency > 0.7:
+            self._mode_manager.request_mode('blended', confidence=1.0, emergency=True)
+          else:
+            confidence = min(1.0, self._urgency * 1.5)
+            self._mode_manager.request_mode('blended', confidence=confidence)
+        return
+
     # Car driving at speed lower than set speed: blended if param set
     if self._slowness_param:
       if self._has_slowness and not self._has_slow_down:
-        self._mode_manager.request_mode('blended', confidence=0.5)
+        # If follow lead param is on, and we have a lead, don't trigger slowness
+        if self._follow_lead_param and self._has_lead_filtered:
+          self._mode_manager.request_mode('acc', confidence=0.5)
+        else:
+          # Normal slowness logic when no lead or follow lead param is off
+          self._mode_manager.request_mode('blended', confidence=0.15)
         return
 
     # Default: ACC

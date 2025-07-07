@@ -203,6 +203,7 @@ inline static std::unordered_map<std::string, uint32_t> keys = {
     {"DynamicExperimentalSpeedBased", PERSISTENT | BACKUP},
     {"DynamicExperimentalSpeedValue", PERSISTENT | BACKUP},
     {"DynamicExperimentalSlowness", PERSISTENT | BACKUP},
+    {"DynamicExperimentalFollowLead", PERSISTENT | BACKUP},
 
     // model panel params
     {"LagdToggle", PERSISTENT | BACKUP},

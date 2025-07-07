@@ -153,8 +153,8 @@ def test_lead_velocity_triggers_blended(mock_cp, mock_mpc, default_sm):
   controller = DynamicExperimentalController(mock_cp, mock_mpc, params=params)
 
   # Set lead with negative relative velocity
-  default_sm['radarState'].leadOne.vRel = -1.0  # Below -0.55 threshold
-  default_sm['radarState'].leadOne.status = 1.0  # Lead detected
+  default_sm['radarState'].leadOne.vRel = -0.8
+  default_sm['radarState'].leadOne.status = 1.0
 
   # Need multiple updates for lead filter to build up
   for _ in range(20):
