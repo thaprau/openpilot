@@ -317,8 +317,8 @@ class DynamicExperimentalController:
       if self._follow_lead_param and self._has_lead_filtered and self._last_lead_one is not None:
         lead_distance = self._last_lead_one.dRel
         distance_diff = abs(endpoint_x - lead_distance)
-        if distance_diff < 22.5 and endpoint_x >= (lead_distance - 18.0):
-          urgency *= 0.3
+        if distance_diff < 30 and endpoint_x >= (lead_distance - 18.0):
+          urgency *= 0.25
 
     # Apply filtering but with less smoothing for stops
     self._slow_down_filter.add_data(urgency)
@@ -368,7 +368,7 @@ class DynamicExperimentalController:
       if self._has_slow_down:
         # If follow lead param is on, and we have a lead, prefer ACC unless very urgent
         if self._follow_lead_param and self._has_lead_filtered:
-          if self._urgency > 0.75:
+          if self._urgency > 0.7:
             self._mode_manager.request_mode('blended', confidence=1.0)
           else:
             self._mode_manager.request_mode('acc', confidence=0.7)
