@@ -34,6 +34,8 @@ private:
   ParamControlSP *modelSlowDownControl = nullptr;
   ParamControlSP *fcwControl = nullptr;
   ParamControlSP *hasLeadControl = nullptr;
+  ParamControlSP *slowerLeadControl = nullptr;
+  ParamControlSP *stoppedLeadControl = nullptr;
   ParamControlSP *distanceBasedControl = nullptr;
   ParamControlSP *speedBasedControl = nullptr;
   ParamControlSP *slownessControl = nullptr;

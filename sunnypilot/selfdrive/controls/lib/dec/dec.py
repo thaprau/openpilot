@@ -8,7 +8,7 @@ See the LICENSE.md file in the root directory for more details.
 
 from cereal import messaging
 from opendbc.car import structs
-from numpy import interp
+from numpy import clip, interp
 from openpilot.common.params import Params
 from openpilot.common.realtime import DT_MDL
 from openpilot.sunnypilot.selfdrive.controls.lib.dec.constants import WMACConstants
@@ -170,10 +170,30 @@ class DynamicExperimentalController:
       alpha=1.1,
       smoothing_factor=0.5
     )
+
+    self._slow_lead_filter = SmoothKalmanFilter(
+      measurement_noise=0.1,
+      process_noise=0.05,
+      alpha=1.02,
+      smoothing_factor=0.8
+    )
+
+    self._stopped_lead_filter = SmoothKalmanFilter(
+      measurement_noise=0.05,
+      process_noise=0.05,
+      alpha=1.05,
+      smoothing_factor=0.55
+    )
+
     self._has_lead_filtered = False
     self._has_slow_down = False
     self._has_slowness = False
     self._has_mpc_fcw = False
+    self._has_slow_lead = False
+    self._has_slower_lead = False
+    self._has_stopped_lead = False
+    self._has_stopped_lead_filtered = False
+    self._v_ego = 0.0
     self._v_ego_kph = 0.0
     self._v_cruise_kph = 0.0
     self._has_standstill = False
@@ -191,6 +211,8 @@ class DynamicExperimentalController:
       self._model_slow_down_param = self._params.get_bool("DynamicExperimentalModelSlowDown")
       self._fcw_param = self._params.get_bool("DynamicExperimentalFCW")
       self._has_lead_param = self._params.get_bool("DynamicExperimentalHasLead")
+      self._slower_lead_param = self._params.get_bool("DynamicExperimentalSlowerLead")
+      self._stopped_lead_param = self._params.get_bool("DynamicExperimentalStoppedLead")
       self._distance_based_param = self._params.get_bool("DynamicExperimentalDistanceBased")
       self._distance_value_param = self._params.get("DynamicExperimentalDistanceValue")
       self._speed_based_param = self._params.get_bool("DynamicExperimentalSpeedBased")
@@ -218,7 +240,7 @@ class DynamicExperimentalController:
 
     # Store lead data for use in urgency filter
     self._last_lead_one = lead_one if lead_one.status else None
-
+    self._v_ego = car_state.vEgo
     self._v_ego_kph = car_state.vEgo * 3.6
     self._v_cruise_kph = car_state.vCruise
     self._has_standstill = car_state.standstill
@@ -238,6 +260,9 @@ class DynamicExperimentalController:
     fcw_filtered_value = self._mpc_fcw_filter.get_value() or 0.0
     self._mpc_fcw_filter.add_data(float(self._mpc_fcw_crash_cnt > 0))
     self._has_mpc_fcw = fcw_filtered_value > 0.5
+
+    # Slower/stopped lead detection
+    self._calculate_slower_stopped_lead(lead_one)
 
     # Slow down detection
     self._calculate_slow_down(md)
@@ -328,6 +353,53 @@ class DynamicExperimentalController:
     self._has_slow_down = urgency_filtered > (WMACConstants.SLOW_DOWN_PROB * 0.8)
     self._urgency = urgency_filtered
 
+  def _calculate_slower_stopped_lead(self, lead_one) -> None:
+    """Calculate significantly slower and/or stopped leads."""
+    self._has_slower_lead = False
+    self._has_stopped_lead = False
+    slow_lead_detected = 0.0
+    stopped_lead_detected = 0.0
+
+    if self._has_lead_filtered and lead_one.status:
+      lead_velocity = lead_one.vLead
+      lead_distance = lead_one.dRel
+      relative_velocity = lead_one.vRel
+
+      # Significantly slower lead
+      if self._slower_lead_param:
+        self._has_slower_lead = (relative_velocity < WMACConstants.SLOW_LEAD_VREL_THRESHOLD and
+                                lead_velocity < self._v_ego * WMACConstants.SLOW_LEAD_SPEED_RATIO)
+
+      # Likely stopped lead
+      if self._stopped_lead_param:
+        self._has_stopped_lead = lead_velocity < WMACConstants.SLOW_LEAD_STOPPED_THRESHOLD
+
+      # Filtered slower leads
+      if self._has_slower_lead:
+        if lead_distance < WMACConstants.SLOW_LEAD_DISTANCE_THRESHOLD:
+          # Distance to collision: urgency * distance * speed factors
+          time_to_close = lead_distance / max(abs(relative_velocity), 0.1)
+          slow_lead_detected = min(1.0, (10.0 / max(time_to_close, 1.0)) * (1.0 - lead_distance/75.0) * (abs(relative_velocity)/2.5))
+        else:
+          slow_lead_detected = 0.4
+
+      if self._stopped_lead_param:
+        stopped_lead_detected = float(self._has_stopped_lead)
+
+      self._slow_lead_filter.add_data(slow_lead_detected)
+      self._stopped_lead_filter.add_data(stopped_lead_detected)
+    else:
+      # If no lead, then reset filters
+      self._slow_lead_filter.add_data(0.0)
+      self._stopped_lead_filter.add_data(0.0)
+
+    # Update states
+    slow_lead_value = self._slow_lead_filter.get_value() or 0.0
+    self._has_slow_lead = slow_lead_value >= WMACConstants.SLOW_LEAD_PROB
+
+    stopped_lead_value = self._stopped_lead_filter.get_value() or 0.0
+    self._has_stopped_lead_filtered = stopped_lead_value >= WMACConstants.SLOW_LEAD_PROB
+
   def _dynamic_experimental_mode(self, sm) -> None:
     # Enhanced dynamic experimental mode with confidence-based transitions and emergency handling
     lead_one = sm['radarState'].leadOne
@@ -351,11 +423,19 @@ class DynamicExperimentalController:
         if lead_one.dRel < float(self._distance_value_param):
           self._mode_manager.request_mode('blended', confidence=0.9)
           return
-      # If we have a lead and its speed is significantly lower, use blended
+
       if self._has_lead_param:
-        if  lead_one.vRel < -0.75:
-          self._mode_manager.request_mode('blended', confidence=0.9)
-          return
+        # Significantly slower lead filtering
+        if self._slower_lead_param:
+          if self._has_slow_lead:
+            self._mode_manager.request_mode('blended', confidence=0.8)
+            return
+
+        # Check for stopped lead using filter
+        if self._stopped_lead_param:
+          if self._has_stopped_lead_filtered:
+            self._mode_manager.request_mode('blended', confidence=1.0)
+            return
 
     # Speed-based decision: if speed is below set point, use blended
     if self._speed_based_param:

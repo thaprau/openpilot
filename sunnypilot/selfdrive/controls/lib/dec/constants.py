@@ -17,3 +17,10 @@ class WMACConstants:
   SLOWNESS_CRUISE_OFFSET = 1.025  # Conservative cruise speed offset
   SLOWNESS_DEFICIT_THRESHOLD = 0.25  # 25% below cruise speed to trigger
   SLOWNESS_MIN_SPEED = 30.0  # Minimum speed to consider slowness (km/h)
+
+  # Lead detection parameters
+  SLOW_LEAD_PROB = 0.6  # Probability for slow lead detection
+  SLOW_LEAD_VREL_THRESHOLD = -1.785  # Relative velocity threshold
+  SLOW_LEAD_SPEED_RATIO = 0.8  # Lead speed ratio compared to ours (80% of our speed)
+  SLOW_LEAD_STOPPED_THRESHOLD = 1.0  # Speed threshold for stopped lead
+  SLOW_LEAD_DISTANCE_THRESHOLD = 75.0  # Distance threshold for filtered detection

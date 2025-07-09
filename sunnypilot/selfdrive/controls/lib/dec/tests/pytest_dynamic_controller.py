@@ -3,10 +3,11 @@ import pytest
 from openpilot.sunnypilot.selfdrive.controls.lib.dec.dec import DynamicExperimentalController
 
 class MockLeadOne:
-  def __init__(self, status=0.0, dRel=100.0, vRel=0.0):
+  def __init__(self, status=0.0, dRel=100.0, vRel=0.0, vLead=0.0):
     self.status = status
     self.dRel = dRel
     self.vRel = vRel
+    self.vLead = vLead
 
 class MockRadarState:
   def __init__(self, status=0.0, dRel=100.0, vRel=0.0):
@@ -36,9 +37,12 @@ class MockParams:
       "DynamicExperimentalModelSlowDown": True,
       "DynamicExperimentalFCW": True,
       "DynamicExperimentalHasLead": True,
+      "DynamicExperimentalSlowerLead": True,
+      "DynamicExperimentalStoppedLead": True,
       "DynamicExperimentalDistanceBased": False,
       "DynamicExperimentalSpeedBased": False,
       "DynamicExperimentalSlowness": True,
+      "DynamicExperimentalFollowLead": False,
       **kwargs
     }
 
@@ -101,11 +105,13 @@ def test_emergency_blended_on_fcw(mock_cp, mock_mpc, default_sm):
 
 def test_slowdown_triggers_blended(mock_cp, mock_mpc, default_sm):
   controller = DynamicExperimentalController(mock_cp, mock_mpc, params=MockParams())
+  default_sm['radarState'].leadOne.status = 0.0
 
   # Force high urgency slowdown condition by replacing the filter
   controller._slow_down_filter = FakeSmoothKalman(value=1.0)
   controller._urgency = 0.8
   controller._has_slow_down = True
+  controller._has_lead_filtered = False
 
   controller.update(default_sm)
   assert controller.mode() == "blended"
@@ -117,6 +123,8 @@ def test_disabled_params_stay_acc(mock_cp, mock_mpc, default_sm):
     DynamicExperimentalModelSlowDown=False,
     DynamicExperimentalFCW=False,
     DynamicExperimentalHasLead=False,
+    DynamicExperimentalSlowerLead=False,
+    DynamicExperimentalStoppedLead=False,
     DynamicExperimentalSlowness=False
   )
   controller = DynamicExperimentalController(mock_cp, mock_mpc, params=params)
