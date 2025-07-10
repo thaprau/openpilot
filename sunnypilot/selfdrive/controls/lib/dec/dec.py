@@ -8,7 +8,7 @@ See the LICENSE.md file in the root directory for more details.
 
 from cereal import messaging
 from opendbc.car import structs
-from numpy import clip, interp
+from numpy import interp
 from openpilot.common.params import Params
 from openpilot.common.realtime import DT_MDL
 from openpilot.sunnypilot.selfdrive.controls.lib.dec.constants import WMACConstants
