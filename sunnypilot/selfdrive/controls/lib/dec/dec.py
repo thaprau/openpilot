@@ -8,6 +8,7 @@ See the LICENSE.md file in the root directory for more details.
 
 from cereal import messaging
 from opendbc.car import structs
+from opendbc.car.hyundai.values import CAR
 from numpy import interp
 from openpilot.common.params import Params
 from openpilot.common.realtime import DT_MDL
@@ -372,14 +373,17 @@ class DynamicExperimentalController:
 
       # Likely stopped lead
       if self._stopped_lead_param:
-        self._has_stopped_lead = lead_velocity < WMACConstants.SLOW_LEAD_STOPPED_THRESHOLD
+        if self._CP.carFingerprint == CAR.KIA_NIRO_PHEV_2022:
+          self._has_stopped_lead = lead_velocity < 5.0
+        else:
+          self._has_stopped_lead = lead_velocity < WMACConstants.SLOW_LEAD_STOPPED_THRESHOLD
 
       # Filtered slower leads
       if self._has_slower_lead:
         if lead_distance < WMACConstants.SLOW_LEAD_DISTANCE_THRESHOLD:
           # Distance to collision: urgency * distance * speed factors
           time_to_close = lead_distance / max(abs(relative_velocity), 0.1)
-          slow_lead_detected = min(1.0, (10.0 / max(time_to_close, 1.0)) * (1.0 - lead_distance/75.0) * (abs(relative_velocity)/2.5))
+          slow_lead_detected = min(1.0, (10.0 / max(time_to_close, 1.0)) * (1.0 - lead_distance/75.0) * (abs(relative_velocity)/2.0))
         else:
           slow_lead_detected = 0.4
 
