@@ -188,7 +188,6 @@ class DynamicExperimentalController:
 
     self._has_lead_filtered = False
     self._has_slow_down = False
-    self._has_slowness = False
     self._has_mpc_fcw = False
     self._has_slow_lead = False
     self._has_slower_lead = False
@@ -218,7 +217,6 @@ class DynamicExperimentalController:
       self._distance_value_param = self._params.get("DynamicExperimentalDistanceValue")
       self._speed_based_param = self._params.get_bool("DynamicExperimentalSpeedBased")
       self._speed_value_param = self._params.get("DynamicExperimentalSpeedValue")
-      self._slowness_param = self._params.get_bool("DynamicExperimentalSlowness")
       self._follow_lead_param = self._params.get_bool("DynamicExperimentalFollowLead")
 
   def mode(self) -> str:
@@ -267,21 +265,6 @@ class DynamicExperimentalController:
 
     # Slow down detection
     self._calculate_slow_down(md)
-
-    # Slowness detection - only when significantly below cruise and not due to normal deceleration
-    if not (self._standstill_count > 5) and not self._has_slow_down:
-      speed_deficit_ratio = (self._v_cruise_kph - self._v_ego_kph) / max(self._v_cruise_kph, 1.0)
-
-      significant_deficit = speed_deficit_ratio > WMACConstants.SLOWNESS_DEFICIT_THRESHOLD
-      reasonable_speed = self._v_ego_kph > WMACConstants.SLOWNESS_MIN_SPEED
-
-      current_slowness = float(significant_deficit and reasonable_speed)
-
-      self._slowness_filter.add_data(current_slowness)
-      slowness_value = self._slowness_filter.get_value() or 0.0
-
-      threshold = WMACConstants.SLOWNESS_PROB * (0.7 if self._has_slowness else 1.2)
-      self._has_slowness = slowness_value > threshold
 
   def _calculate_slow_down(self, md):
     """Calculate urgency based on trajectory endpoint vs expected distance."""
@@ -463,17 +446,6 @@ class DynamicExperimentalController:
           else:
             confidence = min(1.0, self._urgency * 1.5)
             self._mode_manager.request_mode('blended', confidence=confidence)
-        return
-
-    # Car driving at speed lower than set speed: blended if param set
-    if self._slowness_param:
-      if self._has_slowness and not self._has_slow_down:
-        # If follow lead param is on, and we have a lead, don't trigger slowness
-        if self._follow_lead_param:
-          self._mode_manager.request_mode('acc', confidence=0.5)
-        else:
-          # Normal slowness logic when follow lead param is off
-          self._mode_manager.request_mode('blended', confidence=0.1)
         return
 
     # Default: ACC

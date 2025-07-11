@@ -1,6 +1,8 @@
 import pytest
 
 from openpilot.sunnypilot.selfdrive.controls.lib.dec.dec import DynamicExperimentalController
+from openpilot.sunnypilot.selfdrive.controls.lib.dec.constants import WMACConstants
+from opendbc.car.hyundai.values import CAR
 
 class MockLeadOne:
   def __init__(self, status=0.0, dRel=100.0, vRel=0.0, vLead=0.0):
@@ -41,7 +43,6 @@ class MockParams:
       "DynamicExperimentalStoppedLead": True,
       "DynamicExperimentalDistanceBased": False,
       "DynamicExperimentalSpeedBased": False,
-      "DynamicExperimentalSlowness": True,
       "DynamicExperimentalFollowLead": False,
       **kwargs
     }
@@ -65,7 +66,7 @@ def default_sm():
 @pytest.fixture
 def mock_cp():
   class CP:
-    radarUnavailable = False
+    carFingerprint = None
   return CP()
 
 @pytest.fixture
@@ -125,7 +126,6 @@ def test_disabled_params_stay_acc(mock_cp, mock_mpc, default_sm):
     DynamicExperimentalHasLead=False,
     DynamicExperimentalSlowerLead=False,
     DynamicExperimentalStoppedLead=False,
-    DynamicExperimentalSlowness=False
   )
   controller = DynamicExperimentalController(mock_cp, mock_mpc, params=params)
 
@@ -169,3 +169,41 @@ def test_lead_velocity_triggers_blended(mock_cp, mock_mpc, default_sm):
     controller.update(default_sm)
 
   assert controller.mode() == "blended"
+
+def test_stopped_lead_routing(mock_mpc, default_sm):
+  params = MockParams(
+    DynamicExperimentalHasLead=True,
+    DynamicExperimentalSlowerLead=True,
+    DynamicExperimentalStoppedLead=True,
+  )
+
+  def run_controller(controller, sm, vLead, vRel, dRel, expect_stopped, expect_slow=None):
+    sm['radarState'].leadOne.vLead = vLead
+    sm['radarState'].leadOne.vRel = vRel
+    sm['radarState'].leadOne.dRel = dRel
+    for _ in range(20):
+      controller.update(sm)
+    assert controller._has_stopped_lead is expect_stopped
+    assert controller._has_stopped_lead_filtered is expect_stopped
+    if expect_slow is not None:
+      assert controller._has_slow_lead is expect_slow
+
+  class CP:
+    carFingerprint = None
+  controller = DynamicExperimentalController(CP(), mock_mpc, params=params)
+  sm = default_sm.copy()
+  sm['radarState'].leadOne.status = 1.0
+
+  run_controller(controller, sm, WMACConstants.SLOW_LEAD_STOPPED_THRESHOLD - 0.1, -1.0, 10.0, True)
+  run_controller(controller, sm, WMACConstants.SLOW_LEAD_STOPPED_THRESHOLD + 0.1, -1.0, 10.0, False)
+  run_controller(controller, sm, WMACConstants.SLOW_LEAD_STOPPED_THRESHOLD + 0.1, -2.0, 20, False, expect_slow=True)
+  run_controller(controller, sm, WMACConstants.SLOW_LEAD_STOPPED_THRESHOLD + 0.1, -1.5, 20, False, expect_slow=False)
+
+  class CP_PHEV:
+    carFingerprint = CAR.KIA_NIRO_PHEV_2022
+  controller_phev = DynamicExperimentalController(CP_PHEV(), mock_mpc, params=params)
+  sm_phev = default_sm.copy()
+  sm_phev['radarState'].leadOne.status = 1.0
+
+  run_controller(controller_phev, sm_phev, 4.0, -1.0, 10.0, True)
+  run_controller(controller_phev, sm_phev, 5.1, -1.0, 10.0, False)

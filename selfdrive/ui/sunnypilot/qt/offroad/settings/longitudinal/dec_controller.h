@@ -38,7 +38,6 @@ private:
   ParamControlSP *stoppedLeadControl = nullptr;
   ParamControlSP *distanceBasedControl = nullptr;
   ParamControlSP *speedBasedControl = nullptr;
-  ParamControlSP *slownessControl = nullptr;
   ParamControlSP *followLeadControl = nullptr;
   OptionControlSP *distanceValueControl = nullptr;
   OptionControlSP *speedValueControl = nullptr;

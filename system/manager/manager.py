@@ -82,7 +82,6 @@ def manager_init() -> None:
     ("DynamicExperimentalDistanceValue", "30"),
     ("DynamicExperimentalSpeedBased", "0"),
     ("DynamicExperimentalSpeedValue", "25"),
-    ("DynamicExperimentalSlowness", "0"),
     ("DynamicExperimentalFollowLead", "0"),
     ("DynamicExperimentalSlowerLead", "0"),
     ("DynamicExperimentalStoppedLead", "0"),

@@ -62,10 +62,9 @@ DecControllerSubpanel::DecControllerSubpanel(QWidget *parent) : QWidget(parent) 
     params.put("DynamicExperimentalDistanceValue", "30");
     params.put("DynamicExperimentalSpeedBased", "0");
     params.put("DynamicExperimentalSpeedValue", "25");
-    params.put("DynamicExperimentalSlowness", "0");
     params.put("DynamicExperimentalFollowLead", "0");
 
-    std::vector<ParamControlSP*> toggles = {standstillControl, modelSlowDownControl, followLeadControl, fcwControl, hasLeadControl, slowerLeadControl, stoppedLeadControl, distanceBasedControl, speedBasedControl, slownessControl};
+    std::vector<ParamControlSP*> toggles = {standstillControl, modelSlowDownControl, followLeadControl, fcwControl, hasLeadControl, slowerLeadControl, stoppedLeadControl, distanceBasedControl, speedBasedControl};
     for (auto toggle : toggles) {
       if (toggle) toggle->refresh();
     }
@@ -108,9 +107,8 @@ DecControllerSubpanel::DecControllerSubpanel(QWidget *parent) : QWidget(parent) 
 
   add_toggle(fcwControl, "DynamicExperimentalFCW", tr("FCW Detection"), tr("Use blended mode when FCW is detected in the road ahead."), "1");
   add_toggle(standstillControl, "DynamicExperimentalStandstill", tr("Enable at Standstill"), tr("Use blended mode when the vehicle is at a standstill."), "1");
-  add_toggle(followLeadControl, "DynamicExperimentalFollowLead", tr("Follow Lead Vehicle"), tr(""), "0");
   add_toggle(modelSlowDownControl, "DynamicExperimentalModelSlowDown", tr("Model Slow Down Detection"), tr(""), "1");
-  add_toggle(slownessControl, "DynamicExperimentalSlowness", tr("Below Cruise Speed Detection"), tr(""), "0");
+  add_toggle(followLeadControl, "DynamicExperimentalFollowLead", tr("Follow Lead Vehicle"), tr(""), "0");
   add_toggle(hasLeadControl, "DynamicExperimentalHasLead", tr("Lead Vehicle Detection"), tr("Use blended mode when a lead vehicle is detected and significantly slowing."), "0");
 
   auto add_child_button = [&](ParamControlSP *&ptr, const char *param, const QString &title) {
@@ -137,7 +135,6 @@ DecControllerSubpanel::DecControllerSubpanel(QWidget *parent) : QWidget(parent) 
   connect(distanceBasedControl, &ParamControlSP::toggleFlipped, this, &DecControllerSubpanel::updateToggles);
   connect(speedBasedControl, &ParamControlSP::toggleFlipped, this, &DecControllerSubpanel::updateToggles);
   connect(modelSlowDownControl, &ParamControlSP::toggleFlipped, this, &DecControllerSubpanel::updateToggles);
-  connect(slownessControl, &ParamControlSP::toggleFlipped, this, &DecControllerSubpanel::updateToggles);
   connect(followLeadControl, &ParamControlSP::toggleFlipped, this, &DecControllerSubpanel::updateToggles);
   connect(hasLeadControl, &ParamControlSP::toggleFlipped, this, &DecControllerSubpanel::updateToggles);
 
@@ -148,7 +145,6 @@ DecControllerSubpanel::DecControllerSubpanel(QWidget *parent) : QWidget(parent) 
 void DecControllerSubpanel::showAllDescriptions() {
   standstillControl->showDescription();
   modelSlowDownControl->showDescription();
-  slownessControl->showDescription();
   followLeadControl->showDescription();
   fcwControl->showDescription();
   hasLeadControl->showDescription();
@@ -162,15 +158,14 @@ void DecControllerSubpanel::updateToggles() {
   bool distanceBasedEnabled = params.getBool("DynamicExperimentalDistanceBased");
   bool speedBasedEnabled = params.getBool("DynamicExperimentalSpeedBased");
   bool modelSlowDownEnabled = params.getBool("DynamicExperimentalModelSlowDown");
-  bool slownessEnabled = params.getBool("DynamicExperimentalSlowness");
   bool followLeadEnabled = params.getBool("DynamicExperimentalFollowLead");
   bool hasLeadEnabled = params.getBool("DynamicExperimentalHasLead");
-  bool followLeadActive = followLeadEnabled && modelSlowDownEnabled && slownessEnabled;
-  bool allowFollowLead = modelSlowDownEnabled && slownessEnabled;
+  bool followLeadActive = followLeadEnabled && modelSlowDownEnabled;
+  bool allowFollowLead = modelSlowDownEnabled;
 
-  followLeadControl->setEnabled(modelSlowDownEnabled && slownessEnabled);
+  followLeadControl->setEnabled(modelSlowDownEnabled);
   modelSlowDownControl->setEnabled(!followLeadActive);
-  slownessControl->setEnabled(!followLeadActive);
+
 
   slowerLeadControl->setVisible(hasLeadEnabled);
   stoppedLeadControl->setVisible(hasLeadEnabled);
@@ -179,16 +174,14 @@ void DecControllerSubpanel::updateToggles() {
   if (followLeadActive) {
     followLeadControl->setDescription(tr("Currently active. Prefers ACC with weighted confidence when following a lead vehicle for normal scenarios. If the model wants to slowdown significantly, it will still trigger blended mode."));
     modelSlowDownControl->setDescription(tr("Disabled when Follow Lead Vehicle is active. Follow Lead mode overrides this when a lead vehicle is present (except during imminent slowdown scenarios)."));
-    slownessControl->setDescription(tr("Disabled when Follow Lead Vehicle is active. Follow Lead mode overrides this when a lead vehicle is present."));
   } else if (allowFollowLead) {
-    followLeadControl->setDescription(tr("When enabled, prefers ACC mode when following a lead vehicle for normal scenarios. Model wants to stop now situations still trigger blended mode."));
+    followLeadControl->setDescription(tr("When enabled, overrides model slow down detection, and prefers ACC mode when following a lead vehicle for normal scenarios. Model wants to stop now situations still trigger blended mode."));
   } else {
-    followLeadControl->setDescription(tr("Model slow down detection and below cruise speed detection must be enabled to use this mode."));
+    followLeadControl->setDescription(tr("Model slow down detection must be enabled to use this mode."));
   }
   // Set default descriptions for model controls when not overridden
   if (!followLeadActive) {
     modelSlowDownControl->setDescription(tr("Use blended mode when the model detects a slow down scenario ahead."));
-    slownessControl->setDescription(tr("Use blended mode when driving significantly slower than the set cruise speed."));
   }
   // Set visibility of option controls based on their parent
   distanceValueControl->setVisible(distanceBasedEnabled);
