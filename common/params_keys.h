@@ -139,6 +139,7 @@ inline static std::unordered_map<std::string, uint32_t> keys = {
     {"DeviceBootMode", PERSISTENT | BACKUP},
     {"DynamicPersonality", PERSISTENT},
     {"EnableGithubRunner", PERSISTENT | BACKUP},
+    {"InteractivityTimeout", PERSISTENT | BACKUP},
     {"MaxTimeOffroad", PERSISTENT | BACKUP},
     {"Brightness", PERSISTENT | BACKUP},
     {"ModelRunnerTypeCache", CLEAR_ON_ONROAD_TRANSITION},

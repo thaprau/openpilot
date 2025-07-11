@@ -57,6 +57,7 @@ def manager_init() -> None:
     ("DeviceBootMode", "0"),
     ("DynamicPersonality", "0"),
     ("HyundaiLongitudinalTuning", "0"),
+    ("InteractivityTimeout", "0"),
     ("LagdToggle", "1"),
     ("LagdToggledelay", "0.2"),
     ("Mads", "1"),

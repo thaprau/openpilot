@@ -58,14 +58,14 @@ def generate_metadata(model_path: Path, output_dir: Path, short_name: str):
     "artifact": {
       "file_name": tinygrad_file.name,
       "download_uri": {
-        "url": "https://gitlab.com/sunnypilot/public/docs.sunnypilot.ai/-/raw/main/<FILLME>",
+        "url": "https://gitlab.com/sunnypilot/public/docs.sunnypilot.ai/-/raw/main/",
         "sha256": tinygrad_hash
       }
     },
     "metadata": {
       "file_name": metadata_file.name,
       "download_uri": {
-        "url": "https://gitlab.com/sunnypilot/public/docs.sunnypilot.ai/-/raw/main/<FILLME>",
+        "url": "https://gitlab.com/sunnypilot/public/docs.sunnypilot.ai/-/raw/main/",
         "sha256": metadata_hash
       }
     }
@@ -83,12 +83,12 @@ def create_metadata_json(models: list, output_dir: Path, custom_name=None, short
     "ref": upstream_branch,
     "environment": "development",
     "runner": "tinygrad",
-    "build_time": datetime.now(UTC).strftime("%Y-%m-%dT%H:%M:%SZ"),
-    "models": models,
-    "overrides": {},
     "index": -1,
     "minimum_selector_version": "-1",
     "generation": "-1",
+    "build_time": datetime.now(UTC).strftime("%Y-%m-%dT%H:%M:%SZ"),
+    "overrides": {},
+    "models": models,
   }
 
   # Write metadata to output_dir
