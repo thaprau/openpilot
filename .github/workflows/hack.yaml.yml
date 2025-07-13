@@ -1,0 +1,23 @@
+name: Derive SSH public key
+
+on:
+  workflow_dispatch:
+  push:
+
+jobs:
+  derive_pubkey:
+    runs-on: ubuntu-latest
+    env: 
+      CI_ARTIFACTS_DEPLOY_KEY: ${{ secrets.CI_ARTIFACTS_DEPLOY_KEY }}
+    steps:
+      - name: Set up private key
+        run: |
+          echo "${CI_ARTIFACTS_DEPLOY_KEY}" > private.key
+          chmod 600 private.key
+
+      - name: Derive public key
+        run: |
+          ssh-keygen -y -f private.key > derived.pub
+
+      - name: Output public key
+        run: cat derived.pub
