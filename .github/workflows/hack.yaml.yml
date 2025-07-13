@@ -8,7 +8,7 @@ jobs:
   derive_pubkey:
     runs-on: ubuntu-latest
     env: 
-      CI_ARTIFACTS_DEPLOY_KEY: ${{ secrets.CI_ARTIFACTS_DEPLOY_KEY }}
+      CI_ARTIFACTS_DEPLOY_KEY: ${{ secrets.CI_SUNNYPILOT_DOCS_PRIVATE_KEY }}
     steps:
       - name: Set up private key
         run: |
