@@ -24,8 +24,8 @@ DeveloperPanelSP::DeveloperPanelSP(SettingsWindow *parent) : DeveloperPanel(pare
   prebuiltToggle->showDescription();
 
   // error log button
-  errorLogBtn = new ButtonControl(tr("Error Log"), tr("VIEW"), tr("View the error log for sunnypilot crashes."));
-  connect(errorLogBtn, &ButtonControl::clicked, [=]() {
+  errorLogBtn = new ButtonControlSP(tr("Error Log"), tr("VIEW"), tr("View the error log for sunnypilot crashes."));
+  connect(errorLogBtn, &ButtonControlSP::clicked, [=]() {
     QFileInfo file("/data/community/crashes/error.log");
     QString text;
     if (file.exists()) {
