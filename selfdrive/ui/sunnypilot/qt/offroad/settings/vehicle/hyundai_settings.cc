@@ -21,7 +21,7 @@ HyundaiSettings::HyundaiSettings(QWidget *parent) : BrandSettingsInterface(paren
   list->addItem(longitudinalTuningToggle);
   longitudinalTuningToggle->showDescription();
 
-  customTuningToggle = new ParamControlSP("LongTuningCustomToggle", tr("Custom Tuning Override"), customTuningToggleDescription(), "");
+  customTuningToggle = new ParamControlSP("LongTuningCustomToggle", tr("Custom Tuning Override"), customTuningToggleDescription(), "", this, true);
   connect(customTuningToggle, &ParamControlSP::toggleFlipped, this, [this](bool state) {
     if (state && !ConfirmationDialog::alert(customTuningWarningMsg(), this)) {
       customTuningToggle->refresh();
@@ -99,7 +99,8 @@ void HyundaiSettings::updateSettings() {
   customTuningToggle->setEnabled(tuning_available);
 
   if (customTuningButtonWidget) {
-    customTuningButtonWidget->setVisible(custom_tuning_enabled && tuning_available);
+    bool show_advanced = Params().getBool("ShowAdvancedControls");
+    customTuningButtonWidget->setVisible(show_advanced && custom_tuning_enabled && tuning_available);
   }
 
   if (custom_tuning_enabled && tuning_available) {

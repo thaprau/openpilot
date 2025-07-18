@@ -20,7 +20,7 @@ SoftwarePanelSP::SoftwarePanelSP(QWidget *parent) : SoftwarePanel(parent) {
   });
 
   // Disable Updates toggle
-  disableUpdatesToggle = new ParamControl("DisableUpdates",
+  disableUpdatesToggle = new ParamControlSP("DisableUpdates",
     tr("Disable Updates"),
     tr("When enabled, software updates will be disabled. <b>This requires a reboot to take effect.</b>"),
     "../assets/icons/icon_warning.png",

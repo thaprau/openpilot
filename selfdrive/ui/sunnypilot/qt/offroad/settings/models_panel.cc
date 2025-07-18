@@ -94,7 +94,7 @@ ModelsPanel::ModelsPanel(QWidget *parent) : QWidget(parent) {
                                             tr("Enable this to allow dynamic model output parsing on all models produced "
                                                "after September, 2024. The affects of this toggle have been noted to make "
                                                "Gas and Brake controls noticeably smoother."),
-                                               "../assets/offroad/icon_shell.png");
+                                               "../assets/offroad/icon_shell.png", this, true);
   list->addItem(dynamicModeldOutputs);
 
   // LiveDelay toggle
@@ -106,7 +106,7 @@ ModelsPanel::ModelsPanel(QWidget *parent) : QWidget(parent) {
   delay_control = new OptionControlSP("LagdToggledelay", tr("Adjust Software Delay"),
                                      tr("Adjust the software delay when Live Learning Steer Delay is toggled off."
                                         "\nThe default software delay value is 0.2"),
-                                     "", {10, 30}, 1, false, nullptr, true);
+                                     "", {10, 30}, 1, false, nullptr, true, true);
 
   connect(delay_control, &OptionControlSP::updateLabels, [=]() {
     float value = QString::fromStdString(params.get("LagdToggledelay")).toFloat();
