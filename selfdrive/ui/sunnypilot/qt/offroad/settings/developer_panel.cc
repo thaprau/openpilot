@@ -7,6 +7,11 @@
 #include "selfdrive/ui/sunnypilot/qt/offroad/settings/developer_panel.h"
 
 DeveloperPanelSP::DeveloperPanelSP(SettingsWindow *parent) : DeveloperPanel(parent) {
+
+  // Advanced Controls Toggle
+  showAdvancedControls = new ParamControlSP("ShowAdvancedControls", tr("Show Advanced Controls"), tr("Toggle visibility of advanced sunnypilot controls.\nThis only toggles the visibility of the controls; it does not toggle the actual control enabled/disabled state."), "");
+  addItem(showAdvancedControls);
+
   // Github Runner Toggle
   enableGithubRunner = new ParamControlSP("EnableGithubRunner", tr("Enable GitHub runner service"), tr("Enables or disables the github runner service."), "");
   addItem(enableGithubRunner);

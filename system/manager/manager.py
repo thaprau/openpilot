@@ -74,6 +74,7 @@ def manager_init() -> None:
     ("ModelManager_ModelsCache", ""),
     ("NeuralNetworkLateralControl", "0"),
     ("QuietMode", "0"),
+    ("ShowAdvancedControls", "0"),
     ("VisionTurnSpeedControl", "0"),
 
     # Dynamic Experimental Controller
