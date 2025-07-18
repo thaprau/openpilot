@@ -13,6 +13,7 @@ DeveloperPanelSP::DeveloperPanelSP(SettingsWindow *parent) : DeveloperPanel(pare
   addItem(showAdvancedControls);
 
   QObject::connect(showAdvancedControls, &ParamControlSP::toggleFlipped, this, [=](bool) {
+    AbstractControlSP::UpdateAllAdvancedControls();
     updateToggles(!uiState()->scene.started);
   });
   showAdvancedControls->showDescription();
@@ -76,4 +77,5 @@ void DeveloperPanelSP::showEvent(QShowEvent *event) {
   updateToggles(!uiState()->scene.started);
   prebuiltToggle->showDescription();
   showAdvancedControls->showDescription();
+  AbstractControlSP::UpdateAllAdvancedControls();
 }
