@@ -12,12 +12,17 @@ DeveloperPanelSP::DeveloperPanelSP(SettingsWindow *parent) : DeveloperPanel(pare
   showAdvancedControls = new ParamControlSP("ShowAdvancedControls", tr("Show Advanced Controls"), tr("Toggle visibility of advanced sunnypilot controls.\nThis only toggles the visibility of the controls; it does not toggle the actual control enabled/disabled state."), "");
   addItem(showAdvancedControls);
 
+  QObject::connect(showAdvancedControls, &ParamControlSP::toggleFlipped, this, [=](bool) {
+    updateToggles(!uiState()->scene.started);
+  });
+  showAdvancedControls->showDescription();
+
   // Github Runner Toggle
-  enableGithubRunner = new ParamControlSP("EnableGithubRunner", tr("Enable GitHub runner service"), tr("Enables or disables the github runner service."), "");
+  enableGithubRunner = new ParamControlSP("EnableGithubRunner", tr("Enable GitHub runner service"), tr("Enables or disables the github runner service."), "", this, true);
   addItem(enableGithubRunner);
 
   // Fastboot Mode Toggle
-  prebuiltToggle = new ParamControlSP("FastBootToggle", tr("Enable Fastboot Mode"), tr(""), "");
+  prebuiltToggle = new ParamControlSP("FastBootToggle", tr("Enable Fastboot Mode"), tr(""), "", this, true);
   addItem(prebuiltToggle);
 
   QObject::connect(prebuiltToggle, &ParamControl::toggleFlipped, [=](bool state) {
@@ -70,4 +75,5 @@ void DeveloperPanelSP::showEvent(QShowEvent *event) {
   DeveloperPanel::showEvent(event);
   updateToggles(!uiState()->scene.started);
   prebuiltToggle->showDescription();
+  showAdvancedControls->showDescription();
 }
