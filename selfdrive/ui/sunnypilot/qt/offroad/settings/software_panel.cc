@@ -84,5 +84,4 @@ void SoftwarePanelSP::showEvent(QShowEvent *event) {
   SoftwarePanel::showEvent(event);
   updateDisableUpdatesToggle(!uiState()->scene.started);
   disableUpdatesToggle->showDescription();
-  disableUpdatesToggle->refresh();
 }

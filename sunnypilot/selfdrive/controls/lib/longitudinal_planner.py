@@ -27,11 +27,12 @@ class LongitudinalPlannerSP:
     self.slc = SpeedLimitController(CP)
     self.accel_controller = AccelController()
     model_bundle = get_active_bundle()
-    self.generation = model_bundle.generation if model_bundle is not None else None
+    self.generation = int(model_bundle.generation) if (model_bundle := get_active_bundle()) else None
 
   @property
   def mlsim(self) -> bool:
-    return bool(self.generation is not None and self.generation >= 11)
+    # If we don't have a generation set, we assume it's default model. Which as of today are mlsim.
+    return bool(self.generation is None or self.generation >= 11)
 
   def get_mpc_mode(self) -> str | None:
     if not self.dec.active():

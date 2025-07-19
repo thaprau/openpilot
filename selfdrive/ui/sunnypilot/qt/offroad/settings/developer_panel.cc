@@ -22,8 +22,8 @@ DeveloperPanelSP::DeveloperPanelSP(SettingsWindow *parent) : DeveloperPanel(pare
   enableGithubRunner = new ParamControlSP("EnableGithubRunner", tr("Enable GitHub runner service"), tr("Enables or disables the github runner service."), "", this, true);
   addItem(enableGithubRunner);
 
-  // Fastboot Mode Toggle
-  prebuiltToggle = new ParamControlSP("FastBootToggle", tr("Enable Fastboot Mode"), tr(""), "", this, true);
+  // Quickboot Mode Toggle
+  prebuiltToggle = new ParamControlSP("QuickBootToggle", tr("Enable Quickboot Mode"), tr(""), "", this, true);
   addItem(prebuiltToggle);
 
   QObject::connect(prebuiltToggle, &ParamControl::toggleFlipped, [=](bool state) {
@@ -34,7 +34,7 @@ DeveloperPanelSP::DeveloperPanelSP(SettingsWindow *parent) : DeveloperPanel(pare
   prebuiltToggle->setVisible(false);
   prebuiltToggle->showDescription();
 
-  // error log button
+  // Error log button
   errorLogBtn = new ButtonControlSP(tr("Error Log"), tr("VIEW"), tr("View the error log for sunnypilot crashes."));
   connect(errorLogBtn, &ButtonControlSP::clicked, [=]() {
     QFileInfo file("/data/community/crashes/error.log");
@@ -57,20 +57,19 @@ void DeveloperPanelSP::updateToggles(bool offroad) {
   bool disable_updates = params.getBool("DisableUpdates");
 
   prebuiltToggle->setVisible(!is_release && !is_tested && !is_development);
-  prebuiltToggle->setEnabled(offroad && disable_updates);
+  prebuiltToggle->setEnabled(disable_updates);
 
-  params.putBool("FastBootToggle", QFile::exists("/data/openpilot/prebuilt"));
+  params.putBool("QuickBootToggle", QFile::exists("/data/openpilot/prebuilt"));
   prebuiltToggle->refresh();
 
   prebuiltToggle->setDescription(disable_updates
-    ? tr("When toggled on, this creates a prebuilt file so you don't need to compile every device boot. When toggled off, "
+    ? tr("When toggled on, this creates a prebuilt file to allow accelerated boot times. When toggled off, "
          "it immediately removes the prebuilt file so compilation of locally edited cpp files can be made. "
          "<br><br><b>To edit C++ files locally on device, you MUST first turn off this toggle so the changes can recompile.</b>")
-    : tr("Fastboot mode requires updates to be disabled.<br>Enable 'Disable Updates' in the Software panel first."));
+    : tr("Quickboot mode requires updates to be disabled.<br>Enable 'Disable Updates' in the Software panel first."));
 
   enableGithubRunner->setVisible(!is_release);
   errorLogBtn->setVisible(!is_release && !is_tested);
-  prebuiltToggle->setEnabled(true);
   showAdvancedControls->setEnabled(true);
 }
 
