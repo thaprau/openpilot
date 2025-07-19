@@ -69,13 +69,14 @@ void DeveloperPanelSP::updateToggles(bool offroad) {
     : tr("Quickboot mode requires updates to be disabled.<br>Enable 'Disable Updates' in the Software panel first."));
 
   enableGithubRunner->setVisible(!is_release);
-  errorLogBtn->setVisible(!is_release && !is_tested);
+  errorLogBtn->setVisible(!is_release);
   showAdvancedControls->setEnabled(true);
 }
 
 void DeveloperPanelSP::showEvent(QShowEvent *event) {
   DeveloperPanel::showEvent(event);
   updateToggles(!uiState()->scene.started);
+  AbstractControlSP::UpdateAllAdvancedControls();
   prebuiltToggle->showDescription();
   showAdvancedControls->showDescription();
   AbstractControlSP::UpdateAllAdvancedControls();
