@@ -70,6 +70,8 @@ void DeveloperPanelSP::updateToggles(bool offroad) {
 
   enableGithubRunner->setVisible(!is_release);
   errorLogBtn->setVisible(!is_release && !is_tested);
+  prebuiltToggle->setEnabled(true);
+  showAdvancedControls->setEnabled(true);
 }
 
 void DeveloperPanelSP::showEvent(QShowEvent *event) {
