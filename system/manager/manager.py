@@ -63,6 +63,7 @@ def manager_init() -> None:
     ("FastBootToggle", "0"),
     ("HyundaiLongitudinalTuning", "0"),
     ("InteractivityTimeout", "0"),
+    ("IsMetricDistance", "0"),
     ("LagdToggle", "1"),
     ("LagdToggledelay", "0.2"),
     ("Mads", "1"),

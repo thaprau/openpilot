@@ -11,6 +11,10 @@ VisualsPanel::VisualsPanel(QWidget *parent) : QWidget(parent) {
   param_watcher = new ParamWatcher(this);
   connect(param_watcher, &ParamWatcher::paramChanged, [=](const QString &param_name, const QString &param_value) {
     paramsRefresh();
+    if (is_metric_distance_toggle && param_name == "ChevronInfo") {
+      int chevron_val = params.get("ChevronInfo").empty() ? 0 : std::stoi(params.get("ChevronInfo"));
+      is_metric_distance_toggle->setVisible(chevron_val == 1 || chevron_val == 4);
+    }
   });
 
   main_layout = new QStackedLayout(this);
@@ -30,7 +34,6 @@ VisualsPanel::VisualsPanel(QWidget *parent) : QWidget(parent) {
     },
   };
 
-  // Add regular toggles first
   for (auto &[param, title, desc, icon, needs_restart] : toggle_defs) {
     auto toggle = new ParamControlSP(param, title, desc, icon, this);
 
@@ -65,10 +68,27 @@ VisualsPanel::VisualsPanel(QWidget *parent) : QWidget(parent) {
   list->addItem(chevron_info_settings);
   param_watcher->addParam("ChevronInfo");
 
+  is_metric_distance_toggle = new ParamControlSP(
+    "IsMetricDistance",
+    tr("Use Metric Units for Distance"),
+    tr("If enabled, distances below the chevron are shown in meters. If disabled, distances are shown in feet."),
+    "",
+    this
+  );
+  is_metric_distance_toggle->setVisible(false);
+  list->addItem(is_metric_distance_toggle);
+  param_watcher->addParam("IsMetricDistance");
+
   sunnypilotScroller = new ScrollViewSP(list, this);
   vlayout->addWidget(sunnypilotScroller);
 
   main_layout->addWidget(sunnypilotScreen);
+
+  // Set initial visibility of is_metric_distance_toggle
+  if (is_metric_distance_toggle) {
+    int chevron_val = params.get("ChevronInfo").empty() ? 0 : std::stoi(params.get("ChevronInfo"));
+    is_metric_distance_toggle->setVisible(chevron_val == 1 || chevron_val == 4);
+  }
 }
 
 void VisualsPanel::paramsRefresh() {
@@ -82,5 +102,9 @@ void VisualsPanel::paramsRefresh() {
 
   if (chevron_info_settings) {
     chevron_info_settings->refresh();
+  }
+
+  if (is_metric_distance_toggle) {
+    is_metric_distance_toggle->refresh();
   }
 }

@@ -28,4 +28,5 @@ protected:
  std::map<std::string, ParamControlSP*> toggles;
  ParamWatcher * param_watcher;
  ButtonParamControlSP *chevron_info_settings;
+ ParamControlSP *is_metric_distance_toggle = nullptr;
 };

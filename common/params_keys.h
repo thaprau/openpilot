@@ -145,6 +145,7 @@ inline static std::unordered_map<std::string, uint32_t> keys = {
     {"FastBootToggle", PERSISTENT | BACKUP},
     {"InteractivityTimeout", PERSISTENT | BACKUP},
     {"IsDevelopmentBranch", CLEAR_ON_MANAGER_START},
+    {"IsMetricDistance", PERSISTENT | BACKUP},
     {"MaxTimeOffroad", PERSISTENT | BACKUP},
     {"ModelRunnerTypeCache", CLEAR_ON_ONROAD_TRANSITION},
     {"OffroadMode", CLEAR_ON_MANAGER_START},

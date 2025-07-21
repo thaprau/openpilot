@@ -221,12 +221,13 @@ void ModelRenderer::drawLeadStatusAtPosition(QPainter &painter,
     float v_ego = sm["carState"].getCarState().getVEgo();
 
     int chevron_data = std::atoi(Params().get("ChevronInfo").c_str());
+    bool is_metric_distance = Params().getBool("IsMetricDistance");
 
     // Calculate chevron size (same logic as drawLead)
     float sz = std::clamp((25 * 30) / (d_rel / 3 + 30), 15.0f, 30.0f) * 2.35;
 
     QFont content_font = painter.font();
-    content_font.setPixelSize(35);
+    content_font.setPixelSize(40);
     content_font.setBold(true);
     painter.setFont(content_font);
 
@@ -245,8 +246,8 @@ void ModelRenderer::drawLeadStatusAtPosition(QPainter &painter,
     if (chevron_data == 1 || chevron_data == chevron_all) {
         position = 0;
         val = std::max(0.0f, d_rel);
-        QString distance_unit = is_metric ? "m" : "ft";
-        if (!is_metric) {
+        QString distance_unit = is_metric_distance ? "m" : "ft";
+        if (!is_metric_distance) {
             val *= 3.28084f; // Convert meters to feet
         }
         chevron_text[position].append(QString::number(val, 'f', 0) + " " + distance_unit);
@@ -310,7 +311,7 @@ void ModelRenderer::drawLeadStatusAtPosition(QPainter &painter,
             if (text_lines[i].contains("m") || text_lines[i].contains("ft")) {
                 if (d_rel < 20.0f) {
                     text_color = QColor(255, 80, 80, (int)(255 * lead_status_alpha)); // Red - danger
-                } else if (d_rel < 40.0f) {
+                } else if (d_rel < 30.0f) {
                     text_color = QColor(255, 200, 80, (int)(255 * lead_status_alpha)); // Yellow - caution
                 } else {
                     text_color = QColor(80, 255, 120, (int)(255 * lead_status_alpha)); // Green - safe
@@ -319,9 +320,9 @@ void ModelRenderer::drawLeadStatusAtPosition(QPainter &painter,
             // Enhanced color coding for time-to-contact
             else if (text_lines[i].contains("s") && !text_lines[i].contains("---")) {
                 float ttc_val = text_lines[i].left(text_lines[i].length() - 1).toFloat();
-                if (ttc_val < 3.0f) {
+                if (ttc_val < 1.0f) {
                     text_color = QColor(255, 80, 80, (int)(255 * lead_status_alpha)); // Red - urgent
-                } else if (ttc_val < 6.0f) {
+                } else if (ttc_val < 1.6f) {
                     text_color = QColor(255, 200, 80, (int)(255 * lead_status_alpha)); // Yellow - caution
                 } else {
                     text_color = QColor(0xff, 0xff, 0xff, (int)(255 * lead_status_alpha)); // White - safe
