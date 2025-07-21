@@ -21,13 +21,13 @@ static const std::vector<ParamConfig> PARAM_CONFIGS = {
   {"LongTuningStoppingDecelRate", QObject::tr("Stopping Decel Rate"), QObject::tr("Deceleration rate when stopping (m/s²)"), "0.40", 0.01f, 0.8f, 0.01f},
   {"LongTuningLongitudinalActuatorDelay", QObject::tr("Longitudinal Actuator Delay"), QObject::tr("Delay in which desired commands are executed by your vehicle."), "0.45", 0.3f, 0.5f, 0.01f},
   {"LongTuningMinUpperJerk", QObject::tr("Min Upper Jerk"), QObject::tr("Minimum accel jerk limit (m/s³)"), "0.50", 0.5f, 3.0f, 0.1f},
-  {"LongTuningMinLowerJerk", QObject::tr("Min Lower Jerk"), QObject::tr("Minimum braking jerk limit (m/s³)"), "0.50", 0.5f, 5.0f, 0.1f},
-  {"LongTuningJerkLimits", QObject::tr("Dynamic Tune Jerk Max"), QObject::tr("Maximum jerk limits the tune cannot exceed (m/s³)"), "4.00", 2.0f, 5.0f, 0.1f},
+  {"LongTuningMinLowerJerk", QObject::tr("Min Lower Jerk"), QObject::tr("Minimum braking jerk limit (m/s³)"), "0.50", 0.5f, 8.0f, 0.1f},
+  {"LongTuningJerkLimits", QObject::tr("Dynamic Tune Jerk Max"), QObject::tr("Maximum jerk limits the tune cannot exceed (m/s³)"), "4.00", 2.0f, 8.0f, 0.1f},
   {"LongTuningLookaheadJerkBp", QObject::tr("Predictive Jerk Breakpoints"), QObject::tr("Speed breakpoints for predictive jerk (m/s). Format: 2.0,5.0,20.0"), "2.0,5.0,20.0", 0.0f, 40.0f, 0.0f, true},
   {"LongTuningLookaheadJerkUpperV", QObject::tr("Predictive Jerk Upper Values"), QObject::tr("Acceleration jerk values for predictive jerk (m/s³). Format: 0.25,0.5,1.0"), "0.25,0.5,1.0", 0.0f, 1.0f, 0.0f, true},
   {"LongTuningLookaheadJerkLowerV", QObject::tr("Predictive Jerk Lower Values"), QObject::tr("Braking jerk values for predictive jerk (m/s³). Format: 0.05,0.10,0.3"), "0.05,0.10,0.3", 0.0f, 1.0f, 0.0f, true},
   {"LongTuningUpperJerkV", QObject::tr("Upper Jerk Values"), QObject::tr("Acceleration  jerk limited by speed (m/s³). Format: 2.0,2.0,1.2"), "2.0,2.0,1.2", 0.5f, 3.0f, 0.0f, true},
-  {"LongTuningLowerJerkV", QObject::tr("Lower Jerk Values"), QObject::tr("Braking jerk limited by speed (m/s³). Format: 3.0,3.0,2.5"), "3.0,3.0,2.5", 1.5f, 5.0f, 0.0f, true}
+  {"LongTuningLowerJerkV", QObject::tr("Lower Jerk Values"), QObject::tr("Braking jerk limited by speed (m/s³). Format: 3.0,3.0,2.5"), "3.0,3.0,2.5", 1.5f, 8.0f, 0.0f, true}
 };
 
 // Formats a list of comma-separated values with decimals, ensuring each value is within specified min and max limits, preventing erroneous inputs.
