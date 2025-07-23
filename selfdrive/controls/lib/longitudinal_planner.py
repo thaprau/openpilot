@@ -74,7 +74,6 @@ class LongitudinalPlanner(LongitudinalPlannerSP):
 
     self.params = Params()
     self.param_read_counter = 0
-    self.read_param()
 
     self.dynamic_personality = False
 
