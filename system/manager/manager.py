@@ -76,6 +76,7 @@ def manager_init() -> None:
     ("NeuralNetworkLateralControl", "0"),
     ("QuickBootToggle", "0"),
     ("QuietMode", "0"),
+    ("RainbowMode", "0"),
     ("ShowAdvancedControls", "0" if build_metadata.tested_channel else "1"),
     ("VibePersonalityEnabled", "0"),
     ("VibeAccelPersonalityEnabled", "0"),
