@@ -10,9 +10,7 @@ from openpilot.common.swaglog import cloudlog
 from openpilot.selfdrive.modeld.constants import index_function
 from openpilot.selfdrive.controls.radard import _LEAD_ACCEL_TAU
 
-from openpilot.sunnypilot.selfdrive.controls.lib.accel_personality.accel_controller import AccelController
-from openpilot.sunnypilot.selfdrive.controls.lib.dynamic_personality.dynamic_personality_controller import DynamicPersonalityController
-
+from openpilot.sunnypilot.selfdrive.controls.lib.vibe_personality.vibe_personality import VibePersonalityController
 
 if __name__ == '__main__':  # generating code
   from openpilot.third_party.acados.acados_template import AcadosModel, AcadosOcp, AcadosOcpSolver
@@ -232,8 +230,7 @@ class LongitudinalMpc:
     self.solver = AcadosOcpSolverCython(MODEL_NAME, ACADOS_SOLVER_TYPE, N)
     self.reset()
     self.source = SOURCES[2]
-    self.accel_controller = AccelController()
-    self.dynamic_personality_controller = DynamicPersonalityController()
+    self.vibe_controller = VibePersonalityController()
 
   def reset(self):
     # self.solver = AcadosOcpSolverCython(MODEL_NAME, ACADOS_SOLVER_TYPE, N)
@@ -333,12 +330,31 @@ class LongitudinalMpc:
     lead_xv = self.extrapolate_lead(x_lead, v_lead, a_lead, a_lead_tau)
     return lead_xv
 
-  def update(self, radarstate, v_cruise, x, v, a, j, personality=log.LongitudinalPersonality.standard, dynamic_personality=False):
+  def update(self, radarstate, v_cruise, x, v, a, j, personality=log.LongitudinalPersonality.standard):
     v_ego = self.x0[1]
-    t_follow = self.dynamic_personality_controller.get_dynamic_follow_distance(v_ego, personality) if dynamic_personality else get_T_FOLLOW(personality)
+
+    # Get following distance
+    if self.vibe_controller.is_follow_enabled():
+      t_follow = self.vibe_controller.get_follow_distance_multiplier(v_ego)
+      if t_follow is None:
+        # Fallback to stock behavior when vibe controller can't provide a value
+        t_follow = get_T_FOLLOW(personality)
+    else:
+      t_follow = get_T_FOLLOW(personality)
+
     self.status = radarstate.leadOne.status or radarstate.leadTwo.status
 
-    a_cruise_min = self.accel_controller._get_min_accel_for_speed(v_ego)
+    # Get acceleration limits
+    if self.vibe_controller.is_accel_enabled():
+      accel_limits = self.vibe_controller.get_accel_limits(v_ego)
+      if accel_limits is not None:
+        min_accel = accel_limits[0]
+      else:
+        min_accel = CRUISE_MIN_ACCEL
+    else:
+      min_accel = CRUISE_MIN_ACCEL
+
+    a_cruise_min = min_accel
 
     lead_xv_0 = self.process_lead(radarstate.leadOne)
     lead_xv_1 = self.process_lead(radarstate.leadTwo)
@@ -413,7 +429,7 @@ class LongitudinalMpc:
       if any((lead_0_obstacle - get_safe_obstacle_distance(self.x_sol[:,1], t_follow))- self.x_sol[:,0] < 0.0):
         self.source = 'lead0'
       if any((lead_1_obstacle - get_safe_obstacle_distance(self.x_sol[:,1], t_follow))- self.x_sol[:,0] < 0.0) and \
-              (lead_1_obstacle[0] - lead_0_obstacle[0]):
+         (lead_1_obstacle[0] - lead_0_obstacle[0]):
         self.source = 'lead1'
 
   def run(self):

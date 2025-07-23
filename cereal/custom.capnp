@@ -158,7 +158,6 @@ struct LongitudinalPlanSP @0xf35cc4560bbf6ec2 {
     sport @0;
     normal @1;
     eco @2;
-    stock @3;
   }
 }
 

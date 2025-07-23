@@ -140,7 +140,6 @@ inline static std::unordered_map<std::string, uint32_t> keys = {
     {"CustomAccLongPressIncrement", PERSISTENT | BACKUP},
     {"CustomAccShortPressIncrement", PERSISTENT | BACKUP},
     {"DeviceBootMode", PERSISTENT | BACKUP},
-    {"DynamicPersonality", PERSISTENT},
     {"EnableGithubRunner", PERSISTENT | BACKUP},
     {"FastBootToggle", PERSISTENT | BACKUP},
     {"InteractivityTimeout", PERSISTENT | BACKUP},
@@ -153,6 +152,9 @@ inline static std::unordered_map<std::string, uint32_t> keys = {
     {"QuietMode", PERSISTENT | BACKUP},
     {"ShowAdvancedControls", PERSISTENT | BACKUP},
     {"VisionTurnSpeedControl", PERSISTENT | BACKUP},
+    {"VibePersonalityEnabled", PERSISTENT},
+    {"VibeAccelPersonalityEnabled", PERSISTENT},
+    {"VibeFollowPersonalityEnabled", PERSISTENT},
 
     // MADS params
     {"Mads", PERSISTENT | BACKUP},
