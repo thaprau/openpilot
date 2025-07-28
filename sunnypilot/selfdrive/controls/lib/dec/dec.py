@@ -326,8 +326,9 @@ class DynamicExperimentalController:
       if self._follow_lead_param and self._has_lead_filtered and self._last_lead_one is not None:
         lead_distance = self._last_lead_one.dRel
         distance_diff = abs(endpoint_x - lead_distance)
-        if distance_diff < 33 and endpoint_x >= (lead_distance - 18.0):
-          urgency *= 0.25
+        if distance_diff < 50 and endpoint_x >= (lead_distance - 30.0):
+          scale = max(0.2, 1.0 - distance_diff / 80.0)
+          urgency *= scale
 
     # Apply filtering but with less smoothing for stops
     self._slow_down_filter.add_data(urgency)
