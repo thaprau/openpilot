@@ -4,9 +4,12 @@ Copyright (c) 2021-, Haibin Wen, sunnypilot, and a number of other contributors.
 This file is part of sunnypilot and is licensed under the MIT License.
 See the LICENSE.md file in the root directory for more details.
 """
+import math
 
 from cereal import messaging, custom
 from opendbc.car import structs
+from opendbc.car.interfaces import ACCEL_MIN
+from openpilot.common.params import Params
 from openpilot.selfdrive.car.cruise import V_CRUISE_UNSET
 from openpilot.sunnypilot.selfdrive.controls.lib.dec.dec import DynamicExperimentalController
 from openpilot.sunnypilot.selfdrive.controls.lib.speed_limit_controller.speed_limit_controller import SpeedLimitController
@@ -21,13 +24,18 @@ DecState = custom.LongitudinalPlanSP.DynamicExperimentalControl.DynamicExperimen
 class LongitudinalPlannerSP:
   def __init__(self, CP: structs.CarParams, mpc):
     self.events_sp = EventsSP()
-
+    self.transition_init()
     self.dec = DynamicExperimentalController(CP, mpc)
     self.vibe_controller = VibePersonalityController()
     self.v_tsc = VisionTurnController(CP)
     self.slc = SpeedLimitController(CP)
     model_bundle = get_active_bundle()
     self.generation = int(model_bundle.generation) if (model_bundle := get_active_bundle()) else None
+
+  def transition_init(self) -> None:
+    self._params = Params()
+    self._transition_counter = 0
+    self._transition_steps = 40
 
   @property
   def mlsim(self) -> bool:
@@ -59,6 +67,25 @@ class LongitudinalPlannerSP:
 
     v_cruise_final = min(cruise_speeds)
     return v_cruise_final
+
+  def reset_blend_transition(self):
+    self._transition_counter = 0
+
+  def blend_accel_transition(self, mpc_accel: float, e2e_accel: float, v_ego: float) -> float:
+    if self._params.get_bool("BlendAccToE2ETransition"):
+      if self._transition_counter < self._transition_steps:
+        self._transition_counter += 1
+        progress = self._transition_counter / self._transition_steps
+        if v_ego > 5.0 and e2e_accel < 0.0:
+          # use k2.0 and normalize at 0.5
+          sigmoid = 1.0 / (1.0 + math.exp(-2.0 * (abs(e2e_accel / ACCEL_MIN) - 0.5)))
+          blend_factor = 1.0 - (1.0 - progress) * (1.0 - sigmoid)
+          blended = mpc_accel + (e2e_accel - mpc_accel) * blend_factor
+          return blended
+        else:
+          blended = mpc_accel + (e2e_accel - mpc_accel) * progress
+          return blended
+    return min(mpc_accel, e2e_accel)
 
   def update(self, sm: messaging.SubMaster) -> None:
     self.dec.update(sm)

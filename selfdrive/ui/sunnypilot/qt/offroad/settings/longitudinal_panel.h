@@ -41,6 +41,7 @@ private:
   ParamControlSP *visionTurnSpeedControl = nullptr;
   ParamControlSP *dynamicExperimentalControl = nullptr;
 
+  ParamControlSP *accToE2ETransitionControl;
   ParamControlSP *vibePersonalityControl;
   ParamControlSP *vibeAccelPersonalityControl;
   ParamControlSP *vibeFollowPersonalityControl;
