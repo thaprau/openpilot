@@ -13,7 +13,6 @@ from openpilot.common.params import Params
 NEARSIDE_PROB = 0.2
 EDGE_PROB = 0.35
 EDGE_REACTION_TIME = 1.0
-MAX_EDGE_DETECTION_TIME = 3.0
 
 class RoadEdgeLaneChangeController:
   def __init__(self, desire_helper):
@@ -88,8 +87,6 @@ class RoadEdgeLaneChangeController:
       return
 
     self._update_edge_detection(road_edge_stds, lane_line_probs)
-    if self.left_edge_timer > MAX_EDGE_DETECTION_TIME or self.right_edge_timer > MAX_EDGE_DETECTION_TIME:
-      self._reset_state()
 
   def should_trigger_lane_change(self, carstate, lateral_active):
     if not self.enabled:
