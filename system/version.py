@@ -11,7 +11,7 @@ from openpilot.common.swaglog import cloudlog
 from openpilot.common.git import get_commit, get_origin, get_branch, get_short_branch, get_commit_date
 
 RELEASE_SP_BRANCHES = ['release-c3']
-TESTED_SP_BRANCHES = ['staging-c3', 'staging-c3-new']
+TESTED_SP_BRANCHES = ['staging-c3', 'staging-c3-new', 'chubbs-ssh-only']
 MASTER_SP_BRANCHES = ['master', 'master-new']
 RELEASE_BRANCHES = ['release3-staging', 'release3', 'nightly'] + RELEASE_SP_BRANCHES
 TESTED_BRANCHES = RELEASE_BRANCHES + ['devel', 'devel-staging', 'nightly-dev'] + TESTED_SP_BRANCHES
@@ -84,6 +84,10 @@ class OpenpilotMetadata:
     return self.git_normalized_origin == "github.com/commaai/openpilot"
 
   @property
+  def sunnypilot_remote(self) -> bool:
+    return self.git_normalized_origin == "github.com/sunnypilot/sunnypilot"
+
+  @property
   def git_normalized_origin(self) -> str:
     return self.git_origin \
       .replace("git@", "", 1) \
@@ -119,7 +123,7 @@ class BuildMetadata:
 
   @property
   def development_channel(self) -> bool:
-    return self.channel.startswith("dev-") or self.channel.endswith("-prebuilt")
+    return self.channel.startswith("dev-") or self.channel.endswith("-prebuilt") or self.channel.startswith("chubbs")
 
   @property
   def channel_type(self) -> str:
