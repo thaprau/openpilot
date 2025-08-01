@@ -9,8 +9,6 @@ import math
 from cereal import messaging, custom
 from opendbc.car import structs
 from opendbc.car.interfaces import ACCEL_MIN
-from openpilot.common.params import Params
-from openpilot.common.realtime import DT_MDL
 from openpilot.selfdrive.car.cruise import V_CRUISE_UNSET
 from openpilot.sunnypilot.selfdrive.controls.lib.dec.dec import DynamicExperimentalController
 from openpilot.sunnypilot.selfdrive.controls.lib.speed_limit_controller.speed_limit_controller import SpeedLimitController
@@ -65,13 +63,9 @@ class LongitudinalPlannerSP:
     return v_cruise_final
 
   def transition_init(self) -> None:
-    self._params = Params()
-    self.blend_acc_to_e2e: bool = False
-    self.param_read_counter: int = 0
     self._transition_counter: int = 0
     self._transition_steps: int = 40
     self._last_mode = 'acc'
-    self.read_params()
 
   def handle_mode_transition(self, mode: str) -> None:
     if self._last_mode != mode:
@@ -79,16 +73,8 @@ class LongitudinalPlannerSP:
         self._transition_counter = 0
       self._last_mode = mode
 
-  def read_params(self) -> None:
-    self.blend_acc_to_e2e = self._params.get_bool("BlendAccToE2ETransition")
-
-  def update_params(self) -> None:
-    if self.param_read_counter % int(3. / DT_MDL) == 0:
-      self.read_params()
-    self.param_read_counter = (self.param_read_counter + 1) % 1000000
-
   def blend_accel_transition(self, mpc_accel: float, e2e_accel: float, v_ego: float) -> float:
-    if self.blend_acc_to_e2e:
+    if self.dec.enabled():
       if self._transition_counter < self._transition_steps:
         self._transition_counter += 1
         progress = self._transition_counter / self._transition_steps
@@ -106,7 +92,6 @@ class LongitudinalPlannerSP:
   def update(self, sm: messaging.SubMaster) -> None:
     self.dec.update(sm)
     self.vibe_controller.update()
-    self.update_params()
 
   def publish_longitudinal_plan_sp(self, sm: messaging.SubMaster, pm: messaging.PubMaster) -> None:
     plan_sp_send = messaging.new_message('longitudinalPlanSP')
