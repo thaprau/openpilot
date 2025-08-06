@@ -51,9 +51,9 @@ class TorqueBuckets(PointBuckets):
         break
 
 
-class TorqueEstimator(ParameterEstimator, LagdToggle):
+class TorqueEstimator(ParameterEstimator):
   def __init__(self, CP, decimated=False, track_all_points=False):
-    super().__init__()
+    self.lagd_toggle = LagdToggle()
     self.CP = CP
     self.hist_len = int(HISTORY / DT_MDL)
     self.lag = 0.0
@@ -180,7 +180,7 @@ class TorqueEstimator(ParameterEstimator, LagdToggle):
     elif which == "liveCalibration":
       self.calibrator.feed_live_calib(msg)
     elif which == "liveDelay":
-      self.lag = self.lagd_torqued_main(self.CP, msg)
+      self.lag = self.lagd_toggle.lagd_torqued_main(self.CP, msg)
     # calculate lateral accel from past steering torque
     elif which == "livePose":
       if len(self.raw_points['steer_torque']) == self.hist_len:

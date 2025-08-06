@@ -93,8 +93,7 @@ class Controls(ControlsExt):
                                            torque_params.frictionCoefficientFiltered)
 
       self.LaC.extension.update_model_v2(self.sm['modelV2'])
-      calculated_lag = self.LaC.extension.lagd_torqued_main(self.CP, self.sm['liveDelay'])
-      self.LaC.extension.update_lateral_lag(calculated_lag)
+      self.LaC.extension.update_lateral_lag(self.sm['liveDelay'])
 
     long_plan = self.sm['longitudinalPlan']
     model_v2 = self.sm['modelV2']
