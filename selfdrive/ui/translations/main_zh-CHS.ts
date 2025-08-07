@@ -975,14 +975,6 @@ Firehose Mode allows you to maximize your training data uploads to improve openp
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Blend chill to experimental mode transition</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Enable to blend braking desires when switching from chill to experimental in a smoother, more natural way. This allows for a gradual transition when switching from ACC to E2E longitudinal control.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Vibe Personality Controller</source>
         <translation type="unfinished"></translation>
     </message>

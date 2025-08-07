@@ -84,9 +84,6 @@ def manager_init() -> None:
 
     ("VisionTurnSpeedControl", "0"),
 
-    # Blend Acc to E2E Transition
-    ("BlendAccToE2ETransition", "0"),
-
     # Dynamic Experimental Controller
     ("DynamicExperimentalControl", "0"),
     ("DynamicExperimentalStandstill", "1"),
