@@ -32,7 +32,6 @@ DeveloperPanelSP::DeveloperPanelSP(SettingsWindow *parent) : DeveloperPanel(pare
     prebuiltToggle->refresh();
   });
   prebuiltToggle->setVisible(false);
-  prebuiltToggle->showDescription();
 
   // Error log button
   errorLogBtn = new ButtonControlSP(tr("Error Log"), tr("VIEW"), tr("View the error log for sunnypilot crashes."));
@@ -48,17 +47,16 @@ DeveloperPanelSP::DeveloperPanelSP(SettingsWindow *parent) : DeveloperPanel(pare
   addItem(errorLogBtn);
 
   QObject::connect(uiState(), &UIState::offroadTransition, this, &DeveloperPanelSP::updateToggles);
+
+  is_release = params.getBool("IsReleaseBranch");
+  is_development = params.getBool("IsDevelopmentBranch");
 }
 
 void DeveloperPanelSP::updateToggles(bool offroad) {
-  bool is_release = params.getBool("IsReleaseBranch");
-  bool is_tested = params.getBool("IsTestedBranch");
-  bool is_development = params.getBool("IsDevelopmentBranch");
   bool disable_updates = params.getBool("DisableUpdates");
 
-  prebuiltToggle->setVisible(!is_release && !is_tested && !is_development);
+  prebuiltToggle->setVisible(!is_release && !is_development);
   prebuiltToggle->setEnabled(disable_updates);
-
   params.putBool("QuickBootToggle", QFile::exists("/data/openpilot/prebuilt"));
   prebuiltToggle->refresh();
 
@@ -67,6 +65,7 @@ void DeveloperPanelSP::updateToggles(bool offroad) {
          "it immediately removes the prebuilt file so compilation of locally edited cpp files can be made. "
          "<br><br><b>To edit C++ files locally on device, you MUST first turn off this toggle so the changes can recompile.</b>")
     : tr("Quickboot mode requires updates to be disabled.<br>Enable 'Disable Updates' in the Software panel first."));
+  prebuiltToggle->showDescription();
 
   enableGithubRunner->setVisible(!is_release);
   errorLogBtn->setVisible(!is_release);
@@ -75,9 +74,6 @@ void DeveloperPanelSP::updateToggles(bool offroad) {
 
 void DeveloperPanelSP::showEvent(QShowEvent *event) {
   DeveloperPanel::showEvent(event);
+  AbstractControlSP::UpdateAllAdvancedControls();
   updateToggles(!uiState()->scene.started);
-  AbstractControlSP::UpdateAllAdvancedControls();
-  prebuiltToggle->showDescription();
-  showAdvancedControls->showDescription();
-  AbstractControlSP::UpdateAllAdvancedControls();
 }

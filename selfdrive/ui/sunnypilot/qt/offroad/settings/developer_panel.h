@@ -7,7 +7,6 @@
 #pragma once
 #include <QFile>
 #include <QFileInfo>
-#include <QDir>
 
 #include "selfdrive/ui/qt/offroad/developer_panel.h"
 
@@ -22,6 +21,8 @@ private:
   ParamControlSP *prebuiltToggle;
   Params params;
   ParamControlSP *showAdvancedControls;
+  bool is_development;
+  bool is_release;
 
 private slots:
   void updateToggles(bool offroad);
