@@ -146,7 +146,16 @@ class LongitudinalPlanner(LongitudinalPlannerSP):
         steer_angle_without_offset = sm['carState'].steeringAngleDeg - sm['liveParameters'].angleOffsetDeg
         accel_clip = limit_accel_in_turns(v_ego, steer_angle_without_offset, accel_clip, self.CP)
     else:
-      accel_clip = [ACCEL_MIN, ACCEL_MAX]
+      # For mode != 'acc' ('blended')
+      if self.vibe_controller.is_accel_enabled():
+        accel_limits = self.vibe_controller.get_accel_limits(v_ego)
+        if accel_limits is not None:
+          max_accel = accel_limits[1]
+          accel_clip = [ACCEL_MIN, max_accel]
+        else:
+          accel_clip = [ACCEL_MIN, ACCEL_MAX]
+      else:
+        accel_clip = [ACCEL_MIN, ACCEL_MAX]
 
     if reset_state:
       self.v_desired_filter.x = v_ego
