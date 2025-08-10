@@ -53,6 +53,8 @@ def get_init_params(params) -> list[dict[str, str]]:
   keys: list = [
     "HyundaiLongitudinalTuning",
     "LongTuningCustomToggle",
+    "LongTuningAccelMin",
+    "LongTuningAccelMax",
     "LongTuningVEgoStopping",
     "LongTuningVEgoStarting",
     "LongTuningStoppingDecelRate",

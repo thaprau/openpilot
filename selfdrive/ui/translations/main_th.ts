@@ -1205,10 +1205,6 @@ The default software delay value is 0.2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Enable this for the car to learn and adapt its steering response time. Disable to use a fixed steering response time. Keeping this on provides the stock openpilot experience. The Current value is updated automatically when the vehicle is Onroad.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Model download has started in the background.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1274,6 +1270,26 @@ The default software delay value is 0.2</source>
     </message>
     <message>
         <source>Enable this to allow dynamic parsing on all models produced after September, 2024. The effects of this toggle have been said to make Gas and Brake controls noticeably smoother.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable this for the car to learn and adapt its steering response time. Disable to use a fixed steering response time. Keeping this on provides the stock openpilot experience.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Live Steer Delay:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Actuator Delay:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Software Delay:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Total Delay:</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1904,6 +1920,22 @@ Warning: You are on a metered connection!</source>
     </message>
     <message>
         <source>Braking jerk limited by speed (m/s³). Format: 3.0,3.0,2.5</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Decel Max</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Deceleration limit, higher negative value equals more brakeforce (m/s^2)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Accel Max</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Acceleration limit (m/s^2)</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

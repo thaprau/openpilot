@@ -27,6 +27,8 @@ class ParamStore:
       brand_params.extend([
         "HyundaiLongitudinalTuning",
         "LongTuningCustomToggle",
+        "LongTuningAccelMin",
+        "LongTuningAccelMax",
         "LongTuningVEgoStopping",
         "LongTuningVEgoStarting",
         "LongTuningStoppingDecelRate",

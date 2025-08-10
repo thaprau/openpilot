@@ -199,6 +199,8 @@ inline static std::unordered_map<std::string, ParamKeyAttributes> keys = {
 
     // Hyundai Longitudinal Tuning Live Parameters
     {"LongTuningCustomToggle", {PERSISTENT | BACKUP, INT, "0"}},
+    {"LongTuningAccelMin", {PERSISTENT | BACKUP, FLOAT, "-3.5"}},
+    {"LongTuningAccelMax", {PERSISTENT | BACKUP, FLOAT, "2.0"}},
     {"LongTuningVEgoStopping", {PERSISTENT | BACKUP, FLOAT, ".25"}},
     {"LongTuningVEgoStarting", {PERSISTENT | BACKUP, FLOAT, ".10"}},
     {"LongTuningStoppingDecelRate", {PERSISTENT | BACKUP, FLOAT, ".40"}},

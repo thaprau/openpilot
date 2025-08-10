@@ -16,6 +16,8 @@ struct ParamConfig {
 
 // Clipping limits on all tuning params to help prevent unsafe values.
 static const std::vector<ParamConfig> PARAM_CONFIGS = {
+  {"LongTuningAccelMin", QObject::tr("Decel Max"), QObject::tr("Deceleration limit, higher negative value equals more brakeforce (m/s^2)"), "-3.50", -3.5f, -1.0f, 0.2f},
+  {"LongTuningAccelMax", QObject::tr("Accel Max"), QObject::tr("Acceleration limit (m/s^2)"), "2.00", 0.5f, 2.0f, 0.2f},
   {"LongTuningVEgoStopping", QObject::tr("Stopping Threshold"), QObject::tr("Velocity threshold for stopping behavior (m/s)"), "0.25", 0.05f, 0.5f, 0.01f},
   {"LongTuningVEgoStarting", QObject::tr("Starting Threshold"), QObject::tr("Velocity threshold for starting behavior (m/s)"), "0.10", 0.05f, 0.25f, 0.01f},
   {"LongTuningStoppingDecelRate", QObject::tr("Stopping Decel Rate"), QObject::tr("Deceleration rate when stopping (m/s²)"), "0.40", 0.01f, 0.8f, 0.01f},
