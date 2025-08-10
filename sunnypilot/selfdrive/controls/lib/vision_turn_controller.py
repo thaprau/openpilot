@@ -153,7 +153,7 @@ class VisionTurnController:
     self._lat_acc_overshoot_ahead = False
 
   def _update_params(self):
-    tm = time.time()
+    tm = time.monotonic()
     if tm > self._last_params_update + 5.0:
       self._is_enabled = self._params.get_bool("VisionTurnSpeedControl")
       self._last_params_update = tm

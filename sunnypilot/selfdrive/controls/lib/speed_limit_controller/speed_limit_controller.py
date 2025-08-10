@@ -141,7 +141,7 @@ class SpeedLimitController:
     if offset_type == OffsetType.default:
       return float(np.interp(self._speed_limit, LIMIT_PERC_OFFSET_BP, LIMIT_PERC_OFFSET_V) * self._speed_limit)
     elif offset_type == OffsetType.fixed:
-      return offset_value * (CV.KPH_TO_MS if self._is_metric else CV.MPH_TO_MS)
+      return float(offset_value * (CV.KPH_TO_MS if self._is_metric else CV.MPH_TO_MS))
     elif offset_type == OffsetType.percentage:
       return offset_value * 0.01 * self._speed_limit
     else:

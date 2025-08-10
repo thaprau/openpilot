@@ -9,7 +9,6 @@ import numpy as np
 
 from openpilot.selfdrive.controls.lib.drive_helpers import CONTROL_N
 from openpilot.selfdrive.modeld.constants import ModelConstants
-from openpilot.sunnypilot.livedelay.lagd_toggle import LagdToggle
 
 LAT_PLAN_MIN_IDX = 5
 LATERAL_LAG_MOD = 0.0 # seconds, modifies how far in the future we look ahead for the lateral plan
@@ -44,13 +43,10 @@ def get_lookahead_value(future_vals, current_val):
 
 class LatControlTorqueExtBase:
   def __init__(self, lac_torque, CP, CP_SP):
-    self.lagd_toggle = LagdToggle()
-    self.CP = CP
-    self._frame = 0
     self.model_v2 = None
     self.model_valid = False
     self.torque_params = lac_torque.torque_params
-    self.use_steering_angle = lac_torque.torque_params.useSteeringAngle
+    self.use_steering_angle = True  # FIXME-SP: deprecated in upstream
 
     self.actual_lateral_jerk: float = 0.0
     self.lateral_jerk_setpoint: float = 0.0
@@ -95,11 +91,8 @@ class LatControlTorqueExtBase:
     self.model_v2 = model_v2
     self.model_valid = self.model_v2 is not None and len(self.model_v2.orientation.x) >= CONTROL_N
 
-  def update_lateral_lag(self, live_delay):
-    if self._frame % 300 == 0:
-      lag = self.lagd_toggle.lagd_torqued_main(self.CP, live_delay)
-      self.desired_lat_jerk_time = max(0.01, lag) + LATERAL_LAG_MOD
-    self._frame = (self._frame + 1) % 1000000
+  def update_lateral_lag(self, lag):
+    self.desired_lat_jerk_time = max(0.01, lag) + LATERAL_LAG_MOD
 
   def update_friction_input(self, val_1, val_2):
     _error = val_1 - val_2
