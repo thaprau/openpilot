@@ -3,7 +3,7 @@ import numpy as np
 import time
 
 from cereal import messaging, custom
-from openpilot.common.conversions import Conversions as CV
+from opendbc.car.common.conversions import Conversions as CV
 from openpilot.common.params import Params
 from openpilot.sunnypilot.selfdrive.controls.lib.speed_limit_controller import LIMIT_PERC_OFFSET_BP, LIMIT_PERC_OFFSET_V, \
   PARAMS_UPDATE_PERIOD, TEMP_INACTIVE_GUARD_PERIOD, LIMIT_SPEED_OFFSET_TH, SpeedLimitControlState
@@ -168,7 +168,7 @@ class SpeedLimitController:
 
   def _read_policy_param(self) -> Policy:
     try:
-      return Policy(int(self._params.get("SpeedLimitControlPolicy", encoding='utf8')))
+      return Policy(int(self._params.get("SpeedLimitControlPolicy")))
     except (ValueError, TypeError):
       return Policy.car_state_priority
 
@@ -180,7 +180,7 @@ class SpeedLimitController:
 
   def _read_int_param(self, key: str, default: int = 0, validator: Callable[[int], int] = None) -> int:
     try:
-      val = int(self._params.get(key, encoding='utf8'))
+      val = int(self._params.get(key))
 
       if validator is not None:
         return validator(val)

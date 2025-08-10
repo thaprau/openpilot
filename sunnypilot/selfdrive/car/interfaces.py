@@ -67,4 +67,4 @@ def get_init_params(params) -> list[dict[str, str]]:
     "LongTuningLowerJerkV",
   ]
 
-  return [{k: params.get(k, encoding='utf8') or "0"} for k in keys]
+  return [{k: params.get(k) or "0"} for k in keys]
