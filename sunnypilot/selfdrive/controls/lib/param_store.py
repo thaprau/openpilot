@@ -30,17 +30,10 @@ class ParamStore:
         "LongTuningAccelMin",
         "LongTuningAccelMax",
         "LongTuningVEgoStopping",
-        "LongTuningVEgoStarting",
         "LongTuningStoppingDecelRate",
-        "LongTuningLongitudinalActuatorDelay",
         "LongTuningMinUpperJerk",
         "LongTuningMinLowerJerk",
         "LongTuningJerkLimits",
-        "LongTuningLookaheadJerkBp",
-        "LongTuningLookaheadJerkUpperV",
-        "LongTuningLookaheadJerkLowerV",
-        "LongTuningUpperJerkV",
-        "LongTuningLowerJerkV",
       ])
 
     self.keys = universal_params + brand_params
