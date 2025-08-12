@@ -112,7 +112,7 @@ cdef class Params:
       cloudlog.warning(f"Failed to cast param {key} with {value=} from type {t=}")
       return self._cpp2python(t, default, None, key)
 
-  def get(self, key, bool block=False, bool return_default=False):
+  def get(self, key, bool block=False, bool return_default=True):
     cdef string k = self.check_key(key)
     cdef ParamKeyType t = self.p.getKeyType(k)
     cdef optional[string] default = self.p.getKeyDefaultValue(k)
