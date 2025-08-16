@@ -1,1 +1,1 @@
-#define DEFAULT_MODEL "Falling Phoenix (Default)"
+#define DEFAULT_MODEL "Kumars Vibe (Default)"
