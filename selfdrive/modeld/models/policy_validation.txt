@@ -1,0 +1,82 @@
+Model 1 checkpoint: merged_onnx_heads_keep with w=0.75 from (model1: 'merged_onnx_heads_keep with w=1.0 from (model1: 'a423dec7-7dcc-4523-aaae-a4012d56b9b5/400') and (model2: 'bc1bfb2f-7266-4a9d-9b48-2123736ce41a/400')') and (model2: '6d6639ee-643e-4f72-bd1c-dda546383854/400')
+Model 2 checkpoint: 47991d0a-34ae-4529-b804-9dc92c218f32/400
+Base model: driving_policy.onnx
+Model to merge: driving_policy.onnx
+--------------------------------------------------
+Found 63 common weights to merge.
+--------------------------------------------------
+WEIGHT NAME ANALYSIS:
+Common weights: ['onnx::Add_221', 'onnx::MatMul_222', 'onnx::MatMul_223', 'onnx::MatMul_238', 'onnx::MatMul_239', 'onnx::MatMul_240', 'pad', 'policy_model.action_block.action_block_in.0.bias', 'policy_model.action_block.action_block_in.0.weight', 'policy_model.action_block.action_block_out.bias']...
+--------------------------------------------------
+Model 1 ONNX head weights (auto-generated): []
+Model 2 ONNX head weights (auto-generated): []
+Possible head patterns found: ['policy_model']
+HEAD SWAPPING ANALYSIS:
+
+MERGING ONNX head weights
+--------------------------------------------------
+Attempting to merge ONNX heads by type:
+Warning: Skipping weight 'policy_model.temporal_hydra.final_layer.plan.bias' due to shape mismatch: (4955,) vs (990,)
+Warning: Skipping weight 'policy_model.temporal_hydra.scale_layer.plan.scale' due to shape mismatch: (4955,) vs (990,)
+Warning: Skipping weight 'policy_model.temporal_hydra.final_layer.plan.weight' due to shape mismatch: (4955, 256) vs (990, 256)
+Warning: Skipping weight 'pad' due to shape mismatch: (1, 3) vs (1, 0)
+Updating model checkpoint to: 'merged_onnx_heads_merge with w=0.9 from (model1: 'merged_onnx_heads_keep with w=0.75 from (model1: 'merged_onnx_heads_keep with w=1.0 from (model1: 'a423dec7-7dcc-4523-aaae-a4012d56b9b5/400') and (model2: 'bc1bfb2f-7266-4a9d-9b48-2123736ce41a/400')') and (model2: '6d6639ee-643e-4f72-bd1c-dda546383854/400')') and (model2: '47991d0a-34ae-4529-b804-9dc92c218f32/400')'
+MERGE SUMMARY:
+  Removed 0 head initializers: []
+  Added 0 head initializers: []
+  Removed 0 head nodes: []
+  Added 0 head nodes: []
+  Replaced 0 outputs: []
+  Merged 59 common trunk weights (weight=0.9)
+  Merged 0 ONNX head weights
+  Behavior: Combined driving patterns from both models
+  Skipped 4 weights due to shape mismatch: ['policy_model.temporal_hydra.final_layer.plan.bias', 'policy_model.temporal_hydra.scale_layer.plan.scale', 'policy_model.temporal_hydra.final_layer.plan.weight', 'pad']
+  
+--------------------------------------------------
+MODEL VALIDATION
+--------------------------------------------------
+1. ONNX Structure Validation:
+    ONNX structure is valid
+
+2. Model Metadata Validation:
+   IR Version: 8
+   Opset Version: [17]
+   Producer: pytorch 2.7.1
+
+3. Graph Structure Validation:
+   Nodes: 107
+   Inputs: 5
+   Outputs: 1
+   Initializers: 63
+   Original nodes: 107 -> Merged: 107
+   Original initializers: 63 -> Merged: 63
+
+4. Input/Output Shape Validation:
+   Input 0: desire -> [1, 25, 8] (10)
+   Input 1: traffic_convention -> [1, 2] (10)
+   Input 2: lateral_control_params -> [1, 2] (10)
+   Input 3: prev_desired_curv -> [1, 25, 1] (10)
+   Input 4: features_buffer -> [1, 25, 512] (10)
+   Output 0: outputs -> [1, 4968] (10)
+
+5. Weight Statistics Validation:
+ Potential weight issues found:
+   policy_model.temporal_summarizer._extra_in.0.weight: shape=(512, 202), mean=0.006752, std=0.090881
+   policy_model.temporal_summarizer._extra_in.0.bias: shape=(512,), mean=0.027039, std=0.080322
+
+6. Node Connectivity Validation:
+    All node inputs are satisfied
+
+7. Inference Capability Test:
+    Model can be loaded by ONNX Runtime
+   Input: desire -> [1, 25, 8] (tensor(float16))
+   Input: traffic_convention -> [1, 2] (tensor(float16))
+   Input: lateral_control_params -> [1, 2] (tensor(float16))
+   Input: prev_desired_curv -> [1, 25, 1] (tensor(float16))
+   Input: features_buffer -> [1, 25, 512] (tensor(float16))
+
+8. Model Size Analysis:
+   Original model: 14.86 MB
+   Merged model: 14.86 MB
+   Size change: +0.0%
+
