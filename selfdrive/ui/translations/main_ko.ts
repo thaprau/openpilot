@@ -790,32 +790,16 @@ Firehose Mode allows you to maximize your training data uploads to improve openp
 <context>
     <name>HyundaiLiveTuning</name>
     <message>
-        <source>← Back</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Reset to Defaults</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Edit</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Enter exactly 3 comma-separated values:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Edit %1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Please enter exactly 3 comma-separated values.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>OK</source>
-        <translation type="unfinished">OK</translation>
+        <translation type="obsolete">OK</translation>
+    </message>
+    <message>
+        <source>Back</source>
+        <translation type="unfinished">뒤로</translation>
+    </message>
+    <message>
+        <source>Reset to defaults</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1839,27 +1823,7 @@ Warning: You are on a metered connection!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Starting Threshold</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Velocity threshold for starting behavior (m/s)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Stopping Decel Rate</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Deceleration rate when stopping (m/s²)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Longitudinal Actuator Delay</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Delay in which desired commands are executed by your vehicle.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1867,15 +1831,7 @@ Warning: You are on a metered connection!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Minimum accel jerk limit (m/s³)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Min Lower Jerk</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Minimum braking jerk limit (m/s³)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1883,63 +1839,35 @@ Warning: You are on a metered connection!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Maximum jerk limits the tune cannot exceed (m/s³)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Predictive Jerk Breakpoints</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Speed breakpoints for predictive jerk (m/s). Format: 2.0,5.0,20.0</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Predictive Jerk Upper Values</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Acceleration jerk values for predictive jerk (m/s³). Format: 0.25,0.5,1.0</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Predictive Jerk Lower Values</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Braking jerk values for predictive jerk (m/s³). Format: 0.05,0.10,0.3</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Upper Jerk Values</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Acceleration  jerk limited by speed (m/s³). Format: 2.0,2.0,1.2</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Lower Jerk Values</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Braking jerk limited by speed (m/s³). Format: 3.0,3.0,2.5</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Decel Max</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Deceleration limit, higher negative value equals more brakeforce (m/s^2)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Accel Max</source>
+        <source>Acceleration limit (m/s^2)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Acceleration limit (m/s^2)</source>
+        <source>Deceleration Max</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Acceleration Max</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Deceleration rate when stopping (m/s^2)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Minimum accel jerk limit (m/s^3)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Minimum braking jerk limit (m/s^3)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Maximum lower jerk limit the tune cannot exceed (m/s^3)</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2562,6 +2490,14 @@ Warning: You are on a metered connection!</source>
     </message>
     <message>
         <source>Not Paired</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable sunnylink uploader to allow sunnypilot to upload your driving data to sunnypilot servers. (only for highest tiers, and does NOT bring ANY benefit to you. We are just testing data volume.)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>[Don&apos;t use] Enable sunnylink uploader</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
