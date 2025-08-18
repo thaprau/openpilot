@@ -107,7 +107,7 @@ class ModelState(ModelStateBase):
     self.full_desire[0,:-1] = self.full_desire[0,1:]
     self.full_desire[0,-1] = new_desire
 
-    # Roll buffer and assign. desire.shape[1] value is usually 24 or 25 depending on model type.
+    # Roll buffer and assign based on desire.shape[1] value
     if self.full_desire.shape[1] > self.numpy_inputs['desire'].shape[1]:
       skip = self.full_desire.shape[1] // self.numpy_inputs['desire'].shape[1]
       self.numpy_inputs['desire'][:] = (
@@ -137,9 +137,9 @@ class ModelState(ModelStateBase):
 
     if "desired_curvature" in outputs:
       input_name_prev = None
-      if 'prev_desired_curvs' in self.numpy_inputs.keys():
+      if "prev_desired_curvs" in self.numpy_inputs.keys():
         input_name_prev = 'prev_desired_curvs'
-      elif 'prev_desired_curv' in self.numpy_inputs.keys():
+      elif "prev_desired_curv" in self.numpy_inputs.keys():
         input_name_prev = 'prev_desired_curv'
       if input_name_prev and input_name_prev in self.temporal_buffers:
         self.process_desired_curvature(outputs, input_name_prev)
