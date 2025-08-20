@@ -1265,18 +1265,6 @@ The default software delay value is 0.2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Allow Dynamic Model Outputs</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Please enable always offroad, or turn vehicle off to use this toggle</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Enable this to allow dynamic parsing on all models produced after September, 2024. The effects of this toggle have been said to make Gas and Brake controls noticeably smoother.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Enable this for the car to learn and adapt its steering response time. Disable to use a fixed steering response time. Keeping this on provides the stock openpilot experience.</source>
         <translation type="unfinished"></translation>
     </message>

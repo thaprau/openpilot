@@ -104,11 +104,6 @@ ModelsPanel::ModelsPanel(QWidget *parent) : QWidget(parent) {
 
   list->addItem(horizontal_line());
 
-  // Dynamic Modeld Outputs toggle
-  dynamicModeldOutputs = new ParamControlSP("DynamicModeldOutputs", tr("Allow Dynamic Model Outputs"),
-                                            tr(""), "../assets/offroad/icon_shell.png", this, true);
-  list->addItem(dynamicModeldOutputs);
-
   // LiveDelay toggle
   lagd_toggle_control = new ParamControlSP("LagdToggle", tr("Live Learning Steer Delay"), "", "../assets/offroad/icon_shell.png");
   lagd_toggle_control->showDescription();
@@ -382,13 +377,6 @@ void ModelsPanel::updateLabels() {
   handleBundleDownloadProgress();
   currentModelLblBtn->setEnabled(!is_onroad && !isDownloading());
   currentModelLblBtn->setValue(GetActiveModelInternalName());
-  dynamicModeldOutputs->setEnabled(!is_onroad);
-
-  // Set description for dynamic outputs based on offroad state
-  dynamicModeldOutputs->setDescription(is_onroad
-    ? tr("Please enable always offroad, or turn vehicle off to use this toggle")
-    : tr("Enable this to allow dynamic parsing on all models produced after September, 2024. The effects of this toggle have been said to make "
-         "Gas and Brake controls noticeably smoother."));
 
   // LiveDelay toggle description
   QString desc = tr("Enable this for the car to learn and adapt its steering response time. "
