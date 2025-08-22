@@ -23,6 +23,7 @@ private:
   ParamControlSP *showAdvancedControls;
   bool is_development;
   bool is_release;
+  bool is_tested;
 
 private slots:
   void updateToggles(bool offroad);

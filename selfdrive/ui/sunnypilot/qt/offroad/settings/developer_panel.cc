@@ -49,6 +49,7 @@ DeveloperPanelSP::DeveloperPanelSP(SettingsWindow *parent) : DeveloperPanel(pare
   QObject::connect(uiState(), &UIState::offroadTransition, this, &DeveloperPanelSP::updateToggles);
 
   is_release = params.getBool("IsReleaseBranch");
+  is_tested = params.getBool("IsTestedBranch");
   is_development = params.getBool("IsDevelopmentBranch");
 }
 
