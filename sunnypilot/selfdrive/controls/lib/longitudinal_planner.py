@@ -64,7 +64,7 @@ class LongitudinalPlannerSP:
 
   def transition_init(self) -> None:
     self._transition_counter: int = 0
-    self._transition_steps: int = 15
+    self._transition_steps: int = 40
     self._last_mode = 'acc'
 
   def handle_mode_transition(self, mode: str) -> None:
