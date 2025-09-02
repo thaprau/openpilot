@@ -231,7 +231,7 @@ inline static std::unordered_map<std::string, ParamKeyAttributes> keys = {
     {"LaneTurnDesire", {PERSISTENT | BACKUP, BOOL, "0"}},
     {"LaneTurnValue", {PERSISTENT | BACKUP, FLOAT, "19.0"}},
 
-    // mapd
+   // mapd
     {"MapAdvisorySpeedLimit", {CLEAR_ON_ONROAD_TRANSITION, FLOAT}},
     {"MapdVersion", {PERSISTENT, STRING}},
     {"MapSpeedLimit", {CLEAR_ON_ONROAD_TRANSITION, FLOAT, "0.0"}},
@@ -253,11 +253,11 @@ inline static std::unordered_map<std::string, ParamKeyAttributes> keys = {
 
     // Speed Limit Control
     {"SpeedLimitControl", {PERSISTENT | BACKUP, BOOL, "0"}},
-    {"SpeedLimitControlPolicy", {PERSISTENT | BACKUP, STRING, "3"}},
-    {"SpeedLimitEngageType", {PERSISTENT | BACKUP, STRING, "0"}},
-    {"SpeedLimitOffsetType", {PERSISTENT | BACKUP, STRING, "0" }},
-    {"SpeedLimitValueOffset", {PERSISTENT | BACKUP, STRING, "0"}},
-    {"SpeedLimitWarningType", {PERSISTENT | BACKUP, STRING, "0"}},
-    {"SpeedLimitWarningOffsetType", {PERSISTENT | BACKUP, STRING, "0"}},
-    {"SpeedLimitWarningValueOffset", {PERSISTENT | BACKUP, STRING, "0"}},
+    {"SpeedLimitControlPolicy", {PERSISTENT | BACKUP, INT, "3"}},
+    {"SpeedLimitEngageType", {PERSISTENT | BACKUP, INT, "0"}},
+    {"SpeedLimitOffsetType", {PERSISTENT | BACKUP, INT, "0"}},
+    {"SpeedLimitValueOffset", {PERSISTENT | BACKUP, INT, "0"}},
+    {"SpeedLimitWarningType", {PERSISTENT | BACKUP, INT, "0"}},
+    {"SpeedLimitWarningOffsetType", {PERSISTENT | BACKUP, INT, "0"}},
+    {"SpeedLimitWarningValueOffset", {PERSISTENT | BACKUP, INT, "0"}},
 };
