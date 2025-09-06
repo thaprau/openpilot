@@ -19,6 +19,7 @@ cdef extern from "common/params.h":
     DEVELOPMENT_ONLY
     CLEAR_ON_IGNITION_ON
     BACKUP
+    EVENT
     ALL
 
   cpdef enum ParamKeyType:

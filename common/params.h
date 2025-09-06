@@ -19,6 +19,7 @@ enum ParamKeyFlag {
   DEVELOPMENT_ONLY = 0x40,
   CLEAR_ON_IGNITION_ON = 0x80,
   BACKUP = 0x100,
+  EVENT = 0x200,
   ALL = 0xFFFFFFFF
 };
 
