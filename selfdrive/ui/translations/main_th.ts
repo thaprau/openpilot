@@ -945,6 +945,44 @@ Firehose Mode allows you to maximize your training data uploads to improve openp
     </message>
 </context>
 <context>
+    <name>LaneTurnDesireControl</name>
+    <message>
+        <source>Lane Turn Desires</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If you&apos;re driving at 20 mph (32 km/h) or below and have your blinker on, the car will plan a turn in that direction at the nearest drivable path. This prevents situations (like at red lights) where the car might plan the wrong turn direction.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Off</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Nudge</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Nudgeless</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>LaneTurnSettings</name>
+    <message>
+        <source>Back</source>
+        <translation type="unfinished">ย้อนกลับ</translation>
+    </message>
+    <message>
+        <source>Adjust Lane Turn Speed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Set the maximum speed for lane turn desires. Default is 19 %1.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>LateralPanel</name>
     <message>
         <source>Modular Assistive Driving System (MADS)</source>
@@ -984,6 +1022,10 @@ Firehose Mode allows you to maximize your training data uploads to improve openp
     </message>
     <message>
         <source>This platform supports limited MADS settings.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Customize Lane Turn</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1319,18 +1361,6 @@ The default software delay value is 0.2</source>
         <source>Total Delay:</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
-        <source>Use Lane Turn Desires</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Adjust Lane Turn Speed</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Set the maximum speed for lane turn desires. Default is 19 %1.</source>
-        <translation type="unfinished"></translation>
-    </message>
 </context>
 <context>
     <name>MultiOptionDialog</name>
@@ -1492,6 +1522,10 @@ The default software delay value is 0.2</source>
         <source>OpenStreetMap database is out of date. New maps must be downloaded if you wish to continue using OpenStreetMap data for Enhanced Speed Control and road name display.
 
 %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;b&gt;Unsupported branch detected&lt;/b&gt; - The current version of &lt;b&gt;&lt;u&gt;%1&lt;/u&gt;&lt;/b&gt; branch is no longer supported on the comma three. Please go to &lt;b&gt;[Device &gt; Software]&lt;/b&gt; and install a supported branch with &lt;b&gt;&lt;u&gt;-tici&lt;/u&gt;&lt;/b&gt; in the branch name for the comma three.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

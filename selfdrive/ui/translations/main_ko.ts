@@ -964,6 +964,44 @@ Firehose 모드를 사용하면 훈련 데이터 업로드를 극대화하여 op
     </message>
 </context>
 <context>
+    <name>LaneTurnDesireControl</name>
+    <message>
+        <source>Lane Turn Desires</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If you&apos;re driving at 20 mph (32 km/h) or below and have your blinker on, the car will plan a turn in that direction at the nearest drivable path. This prevents situations (like at red lights) where the car might plan the wrong turn direction.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Off</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Nudge</source>
+        <translation type="unfinished">핸들 조작 필요</translation>
+    </message>
+    <message>
+        <source>Nudgeless</source>
+        <translation type="unfinished">조작 필요 없음</translation>
+    </message>
+</context>
+<context>
+    <name>LaneTurnSettings</name>
+    <message>
+        <source>Back</source>
+        <translation type="unfinished">뒤로</translation>
+    </message>
+    <message>
+        <source>Adjust Lane Turn Speed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Set the maximum speed for lane turn desires. Default is 19 %1.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>LateralPanel</name>
     <message>
         <source>Modular Assistive Driving System (MADS)</source>
@@ -1004,6 +1042,10 @@ Firehose 모드를 사용하면 훈련 데이터 업로드를 극대화하여 op
     <message>
         <source>This platform supports limited MADS settings.</source>
         <translation>이 플랫폼은 제한된 MADS 설정을 지원합니다.</translation>
+    </message>
+    <message>
+        <source>Customize Lane Turn</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1339,18 +1381,6 @@ The default software delay value is 0.2</source>
         <source>Total Delay:</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
-        <source>Use Lane Turn Desires</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Adjust Lane Turn Speed</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Set the maximum speed for lane turn desires. Default is 19 %1.</source>
-        <translation type="unfinished"></translation>
-    </message>
 </context>
 <context>
     <name>MultiOptionDialog</name>
@@ -1515,6 +1545,10 @@ The default software delay value is 0.2</source>
         <translation>OpenStreetMap 데이터베이스가 최신이 아닙니다. 향상된 속도 제어 및 도로명 표시를 위해 OpenStreetMap 데이터를 계속 사용하려면, 새로운 지도를 다운로드해야 합니다.
 
 %1</translation>
+    </message>
+    <message>
+        <source>&lt;b&gt;Unsupported branch detected&lt;/b&gt; - The current version of &lt;b&gt;&lt;u&gt;%1&lt;/u&gt;&lt;/b&gt; branch is no longer supported on the comma three. Please go to &lt;b&gt;[Device &gt; Software]&lt;/b&gt; and install a supported branch with &lt;b&gt;&lt;u&gt;-tici&lt;/u&gt;&lt;/b&gt; in the branch name for the comma three.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
