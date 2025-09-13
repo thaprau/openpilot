@@ -86,6 +86,15 @@ VisualsPanel::VisualsPanel(QWidget *parent) : QWidget(parent) {
   list->addItem(is_metric_distance_toggle);
   param_watcher->addParam("IsMetricDistance");
 
+  // Visuals: Developer UI Info (Dev UI)
+  std::vector<QString> dev_ui_settings_texts{tr("Off"), tr("Right"), tr("Right &&\nBottom")};
+  dev_ui_settings = new ButtonParamControlSP(
+    "DevUIInfo", tr("Developer UI"), tr("Display real-time parameters and metrics from various sources."),
+    "",
+    dev_ui_settings_texts,
+    380);
+  list->addItem(dev_ui_settings);
+
   sunnypilotScroller = new ScrollViewSP(list, this);
   vlayout->addWidget(sunnypilotScroller);
 
@@ -113,5 +122,9 @@ void VisualsPanel::paramsRefresh() {
 
   if (is_metric_distance_toggle) {
     is_metric_distance_toggle->refresh();
+  }
+
+  if (dev_ui_settings) {
+    dev_ui_settings->refresh();
   }
 }

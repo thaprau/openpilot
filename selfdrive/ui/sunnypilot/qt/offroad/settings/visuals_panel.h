@@ -29,4 +29,5 @@ protected:
  ParamWatcher * param_watcher;
  ButtonParamControlSP *chevron_info_settings;
  ParamControlSP *is_metric_distance_toggle = nullptr;
+ ButtonParamControlSP *dev_ui_settings;
 };
