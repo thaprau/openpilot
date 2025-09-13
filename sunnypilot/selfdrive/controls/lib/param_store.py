@@ -7,6 +7,7 @@ See the LICENSE.md file in the root directory for more details.
 import capnp
 
 from cereal import custom
+from common.swaglog import cloudlog
 
 from opendbc.car import structs
 from openpilot.common.params import Params
@@ -40,5 +41,11 @@ class ParamStore:
   def publish(self) -> list[capnp.lib.capnp._DynamicStructBuilder]:
     if self.cached_params_list is None:
       # TODO-SP: Why are we doing a list instead of a dictionary here?
-      self.cached_params_list = [custom.CarControlSP.Param(key=k, value=self.values[k]) for k in self.keys]
+        self.cached_params_list = []
+        for key in self.keys:
+          try:
+            self.cached_params_list.append(custom.CarControlSP.Param(key=key, value=self.values[key]))
+          except Exception:
+            cloudlog.exception(f"Error publishing CarControlSP.Param for key {key} with value {self.values[key]}")
+            raise
     return self.cached_params_list
