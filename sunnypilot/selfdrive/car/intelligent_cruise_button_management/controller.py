@@ -51,12 +51,15 @@ class IntelligentCruiseButtonManagement:
   def v_cruise_equal(self):
     return self.v_target == self.v_cruise_cluster
 
-  def update_calculations(self, CS: car.CarState) -> None:
+  def update_calculations(self, CS: car.CarState, LP_SP: custom.LongitudinalPlanSP) -> None:
     speed_conv = CV.MS_TO_KPH if self.is_metric else CV.MS_TO_MPH
     v_cruise_ms = CS.vCruise * CV.KPH_TO_MS
 
     # all targets in m/s
-    v_targets = {'cruise': v_cruise_ms}
+    v_targets = {
+      'cruise': v_cruise_ms,
+      'scc_v': LP_SP.smartCruiseControl.vision.vTarget,
+    }
     source = min(v_targets, key=v_targets.get)
     v_target_ms = v_targets[source]
 
@@ -117,13 +120,13 @@ class IntelligentCruiseButtonManagement:
 
     self.is_ready = ready and not button_pressed
 
-  def run(self, CS: car.CarState, CC: car.CarControl, is_metric: bool):
+  def run(self, CS: car.CarState, CC: car.CarControl, LP_SP: custom.LongitudinalPlanSP, is_metric: bool):
     if self.CP_SP.pcmCruiseSpeed:
       return
 
     self.is_metric = is_metric
 
-    self.update_calculations(CS)
+    self.update_calculations(CS, LP_SP)
     self.update_readiness(CS, CC)
 
     self.cruise_button = self.update_state_machine()
