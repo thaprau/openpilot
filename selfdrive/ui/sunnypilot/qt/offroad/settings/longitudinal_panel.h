@@ -31,4 +31,5 @@ private:
   QWidget *cruisePanelScreen = nullptr;
   CustomAccIncrement *customAccIncrement = nullptr;
   ParamControlSP *intelligentCruiseButtonManagement = nullptr;
+  ParamControl *SmartCruiseControlVision;
 };
