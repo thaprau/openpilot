@@ -102,7 +102,7 @@ void LongitudinalPanel::refresh(bool _offroad) {
   customAccIncrement->setEnabled(cai_allowed && !offroad);
   customAccIncrement->refresh();
 
-  SmartCruiseControlVision->setEnabled(has_longitudinal_control);
+  SmartCruiseControlVision->setEnabled(has_longitudinal_control || icbm_allowed);
 
   offroad = _offroad;
 }
