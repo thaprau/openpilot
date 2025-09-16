@@ -134,15 +134,15 @@ void HudRendererSP::drawSmartCruiseVision(QPainter &p, int x, int y) {
   bool blink_on = (static_cast<int>(QTime::currentTime().msec() / 500) % 2) == 0;
 
   QString text = "SCC-V";
-  QFont font = InterFont(32, QFont::Bold);
+  QFont font = InterFont(40, QFont::Bold);
   p.setFont(font);
 
   QFontMetrics fm(font);
   int text_width  = fm.horizontalAdvance(text);
   int text_height = fm.height();
 
-  int padding_h = 20;
-  int padding_v = 10;
+  int padding_h = 25;
+  int padding_v = 13;
 
   int x_offset = -240;
   int y_offset = -100;
@@ -155,7 +155,7 @@ void HudRendererSP::drawSmartCruiseVision(QPainter &p, int x, int y) {
   );
 
   QPainterPath boxPath;
-  boxPath.addRoundedRect(bg_rect, 10, 10);
+  boxPath.addRoundedRect(bg_rect, 13, 13);
 
   if (blink_on) {
     QPainterPath textPath;
