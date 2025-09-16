@@ -80,15 +80,9 @@ void HudRendererSP::updateState(const UIState &s) {
   isStandstill = car_state.getStandstill();
 
   if (sm.alive("longitudinalPlanSP")) {
-    const auto scc_vision = sm["longitudinalPlanSP"]
-                               .getLongitudinalPlanSP()
-                               .getSmartCruiseControl()
-                               .getVision();
-    visionState = static_cast<int>(scc_vision.getState());
-    smartCruiseVisionActive = (visionState == 2 || visionState == 3);
+    smartCruiseVisionActive = sm["longitudinalPlanSP"].getLongitudinalPlanSP().getSmartCruiseControl().getVision().getActive();
   } else {
     smartCruiseVisionActive = false;
-    visionState = 0;
   }
 
 }
