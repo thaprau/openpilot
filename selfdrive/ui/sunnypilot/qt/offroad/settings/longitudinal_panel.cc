@@ -18,6 +18,13 @@ LongitudinalPanel::LongitudinalPanel(QWidget *parent) : QWidget(parent) {
   cruisePanelScroller = new ScrollViewSP(list, this);
   vlayout->addWidget(cruisePanelScroller);
 
+  SmartCruiseControlVision = new ParamControl(
+    "SmartCruiseControlVision",
+    tr("Smart Cruise Control - Vision"),
+    tr("Use vision path predictions to estimate the appropriate speed to drive through turns ahead."),
+    "");
+  list->addItem(SmartCruiseControlVision);
+
   customAccIncrement = new CustomAccIncrement("CustomAccIncrementsEnabled", tr("Custom ACC Speed Increments"), "", "", this);
   list->addItem(customAccIncrement);
 
@@ -112,6 +119,7 @@ void LongitudinalPanel::refresh(bool _offroad) {
   customAccIncrement->setEnabled(has_longitudinal_control && !is_pcm_cruise && !offroad);
   customAccIncrement->refresh();
 
+  SmartCruiseControlVision->setEnabled(has_longitudinal_control);
   // Vibe Personality controls - always enabled for toggling
   vibePersonalityControl->setEnabled(true);
   vibeAccelPersonalityControl->setEnabled(true);

@@ -14,6 +14,7 @@ from openpilot.common.realtime import DT_MDL
 from opendbc.car.interfaces import ACCEL_MIN
 from openpilot.selfdrive.car.cruise import V_CRUISE_UNSET
 from openpilot.sunnypilot.selfdrive.controls.lib.dec.dec import DynamicExperimentalController
+from openpilot.sunnypilot.selfdrive.controls.lib.smart_cruise_control.smart_cruise_control import SmartCruiseControl
 from openpilot.sunnypilot.models.helpers import get_active_bundle
 
 from openpilot.sunnypilot.selfdrive.controls.lib.vibe_personality.vibe_personality import VibePersonalityController
@@ -23,6 +24,7 @@ DecState = custom.LongitudinalPlanSP.DynamicExperimentalControl.DynamicExperimen
 class LongitudinalPlannerSP:
   def __init__(self, CP: structs.CarParams, mpc):
     self.dec = DynamicExperimentalController(CP, mpc)
+    self.scc = SmartCruiseControl(CP)
     self.vibe_controller = VibePersonalityController()
     self.generation = int(model_bundle.generation) if (model_bundle := get_active_bundle()) else None
     self.transition_init()
@@ -38,6 +40,18 @@ class LongitudinalPlannerSP:
 
     return self.dec.mode()
 
+  def update_targets(self, sm: messaging.SubMaster, v_ego: float, a_ego: float, v_cruise: float) -> tuple[float, float]:
+    scc_output_v_target, scc_output_a_target = self.scc.update(sm, v_ego, a_ego, v_cruise)
+
+    targets = {
+      'cruise': (v_cruise, a_ego),
+      'scc': (scc_output_v_target, scc_output_a_target),
+    }
+
+    src = min(targets, key=lambda k: targets[k][0])
+    v_target, a_target = targets[src]
+
+    return v_target, a_target
 
   def transition_init(self) -> None:
     self._transition_counter = 0
@@ -81,5 +95,15 @@ class LongitudinalPlannerSP:
     dec.state = DecState.blended if self.dec.mode() == 'blended' else DecState.acc
     dec.enabled = self.dec.enabled()
     dec.active = self.dec.active()
+
+    # Smart Cruise Control
+    smartCruiseControl = longitudinalPlanSP.smartCruiseControl
+    # Vision Turn Speed Control
+    sccVision = smartCruiseControl.vision
+    sccVision.state = self.scc.vision.state
+    sccVision.vTarget = float(self.scc.vision.output_v_target)
+    sccVision.aTarget = float(self.scc.vision.output_a_target)
+    sccVision.currentLateralAccel = float(self.scc.vision.current_lat_acc)
+    sccVision.maxPredictedLateralAccel = float(self.scc.vision.max_pred_lat_acc)
 
     pm.send('longitudinalPlanSP', plan_sp_send)
