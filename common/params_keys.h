@@ -151,7 +151,6 @@ inline static std::unordered_map<std::string, ParamKeyAttributes> keys = {
     {"EnableCopyparty", {PERSISTENT | BACKUP, BOOL}},
     {"EnableGithubRunner", {PERSISTENT | BACKUP, BOOL}},
     {"GithubRunnerSufficientVoltage", {CLEAR_ON_MANAGER_START , BOOL}},
-    {"GithubRunnerVoltage", {PERSISTENT | BACKUP, BOOL}},
     {"InteractivityTimeout", {PERSISTENT | BACKUP, INT, "0"}},
     {"IsDevelopmentBranch", {CLEAR_ON_MANAGER_START, BOOL}},
     {"IsMetricDistance", {PERSISTENT | BACKUP, BOOL, "0"}},
@@ -163,6 +162,7 @@ inline static std::unordered_map<std::string, ParamKeyAttributes> keys = {
     {"QuietMode", {PERSISTENT | BACKUP, BOOL, "0"}},
     {"RainbowMode", {PERSISTENT | BACKUP, BOOL, "0"}},
     {"ShowAdvancedControls", {PERSISTENT | BACKUP, BOOL, "0"}},
+    {"StandstillTimer", {PERSISTENT | BACKUP, BOOL, "0"}},
     {"VisionTurnSpeedControl", {PERSISTENT | BACKUP, BOOL, "0"}},
     {"VibePersonalityEnabled", {PERSISTENT | BACKUP, BOOL, "0"}},
     {"VibeAccelPersonalityEnabled", {PERSISTENT | BACKUP, BOOL, "0"}},
@@ -232,7 +232,7 @@ inline static std::unordered_map<std::string, ParamKeyAttributes> keys = {
     {"LaneTurnDesire", {PERSISTENT | BACKUP, INT, "0"}},
     {"LaneTurnValue", {PERSISTENT | BACKUP, FLOAT, "19.0"}},
 
-   // mapd
+    // mapd
     {"MapAdvisorySpeedLimit", {CLEAR_ON_ONROAD_TRANSITION, FLOAT}},
     {"MapdVersion", {PERSISTENT, STRING}},
     {"MapSpeedLimit", {CLEAR_ON_ONROAD_TRANSITION, FLOAT, "0.0"}},

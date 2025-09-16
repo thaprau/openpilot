@@ -35,12 +35,20 @@ VisualsPanel::VisualsPanel(QWidget *parent) : QWidget(parent) {
     {
       "RainbowMode",
       tr("Enable Tesla Rainbow Mode"),
-      tr("Enable the rainbow mode, which displays a rainbow effect on the screen."),
+      RainbowizeWords(tr("A beautiful rainbow effect on the path the model wants to take.")) + "<br/><i>" + tr("It")+ " <b>" + tr("does not") + "</b> " + tr("affect driving in any way.") + "</i>",
       "../assets/offroad/icon_monitoring.png",
       false,
-    }
+    },
+    {
+      "StandstillTimer",
+      tr("Enable Standstill Timer"),
+      tr("Show a timer on the HUD when the car is at a standstill."),
+      "../assets/offroad/icon_monitoring.png",
+      false,
+    },
   };
 
+  // Add regular toggles first
   for (auto &[param, title, desc, icon, needs_restart] : toggle_defs) {
     auto toggle = new ParamControlSP(param, title, desc, icon, this);
 
