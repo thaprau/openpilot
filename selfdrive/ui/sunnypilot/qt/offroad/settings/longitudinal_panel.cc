@@ -33,6 +33,13 @@ LongitudinalPanel::LongitudinalPanel(QWidget *parent) : QWidget(parent) {
   cruisePanelScroller = new ScrollViewSP(list, this);
   vlayout->addWidget(cruisePanelScroller);
 
+  SmartCruiseControlVision = new ParamControl(
+    "SmartCruiseControlVision",
+    tr("Smart Cruise Control - Vision"),
+    tr("Use vision path predictions to estimate the appropriate speed to drive through turns ahead."),
+    "");
+  list->addItem(SmartCruiseControlVision);
+
   customAccIncrement = new CustomAccIncrement("CustomAccIncrementsEnabled", tr("Custom ACC Speed Increments"), "", "", this);
   list->addItem(customAccIncrement);
 
@@ -70,15 +77,6 @@ LongitudinalPanel::LongitudinalPanel(QWidget *parent) : QWidget(parent) {
   main_layout->setCurrentWidget(cruisePanelScreen);
   refresh(offroad);
 
-  slcControl = new SpeedLimitControl(
-    "SpeedLimitControl",
-    tr("Speed Limit Control (SLC)"),
-    tr("When you engage ACC, you will be prompted to set the cruising speed to the speed limit of the road adjusted by the Offset and Source Policy specified, or the current driving speed. "
-      "The maximum cruising speed will always be the MAX set speed."),
-    "",
-    this);
-  list->addItem(slcControl);
-
   dynamicExperimentalControl = new ParamControlSP("DynamicExperimentalControl",
     tr("Enable Dynamic Experimental Control"),
     tr("Enable toggle to allow the model to determine when to use sunnypilot ACC or sunnypilot End to End Longitudinal."),
@@ -99,23 +97,6 @@ LongitudinalPanel::LongitudinalPanel(QWidget *parent) : QWidget(parent) {
   bool decEnabled = params.getBool("DynamicExperimentalControl");
   decManageRectBtn->setVisible(decEnabled);
 
-  visionTurnSpeedControl = new ParamControlSP("VisionTurnSpeedControl",
-    tr("Vision Turn Speed Controller"),
-    tr("Also known as V-TSC, this controller automatically slows down for curvature while OP longitudinal is engaged."),
-    "../assets/offroad/icon_shell.png");
-  list->addItem(visionTurnSpeedControl);
-
-  connect(slcControl, &SpeedLimitControl::slcSettingsButtonClicked, [=]() {
-    cruisePanelScroller->setLastScrollPosition();
-    main_layout->setCurrentWidget(slcScreen);
-  });
-
-  slcScreen = new SpeedLimitControlSubpanel(this);
-  connect(slcScreen, &SpeedLimitControlSubpanel::backPress, [=]() {
-    cruisePanelScroller->restoreScrollPosition();
-    main_layout->setCurrentWidget(cruisePanelScreen);
-  });
-
   decScreen = new DecControllerSubpanel(this);
   connect(decScreen, &DecControllerSubpanel::backPress, [=]() {
     cruisePanelScroller->restoreScrollPosition();
@@ -123,7 +104,6 @@ LongitudinalPanel::LongitudinalPanel(QWidget *parent) : QWidget(parent) {
   });
 
   main_layout->addWidget(cruisePanelScreen);
-  main_layout->addWidget(slcScreen);
   main_layout->addWidget(decScreen);
   main_layout->setCurrentWidget(cruisePanelScreen);
 }
@@ -182,6 +162,8 @@ void LongitudinalPanel::refresh(bool _offroad) {
   // enable toggle when long is available and is not PCM cruise
   customAccIncrement->setEnabled(has_longitudinal_control && !is_pcm_cruise && !offroad);
   customAccIncrement->refresh();
+
+  SmartCruiseControlVision->setEnabled(has_longitudinal_control);
 
   // Vibe Personality controls - always enabled for toggling
   vibePersonalityControl->setEnabled(true);

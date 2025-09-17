@@ -21,7 +21,7 @@ Source = custom.LongitudinalPlanSP.LongitudinalPlanSource
 class LongitudinalPlannerSP:
   def __init__(self, CP: structs.CarParams, mpc):
     self.dec = DynamicExperimentalController(CP, mpc)
-    self.scc = SmartCruiseControl()
+    self.scc = SmartCruiseControl(CP)
     self.generation = int(model_bundle.generation) if (model_bundle := get_active_bundle()) else None
     self.source = Source.cruise
     self.transition_init()
@@ -42,7 +42,8 @@ class LongitudinalPlannerSP:
     self.scc.update(sm, v_ego, a_ego, v_cruise)
 
     targets = {
-      Source.cruise : (v_cruise, a_ego),
+      Source.cruise: (v_cruise, a_ego),
+      Source.sccVision: (self.scc.vision.output_v_target, self.scc.vision.output_a_target)
     }
 
     self.source = min(targets, key=lambda k: targets[k][0])
@@ -95,6 +96,15 @@ class LongitudinalPlannerSP:
     dec.active = self.dec.active()
 
     # Smart Cruise Control
-    smartCruiseControl = longitudinalPlanSP.smartCruiseControl  # noqa: F841
+    smartCruiseControl = longitudinalPlanSP.smartCruiseControl
+    # Vision Turn Speed Control
+    sccVision = smartCruiseControl.vision
+    sccVision.state = self.scc.vision.state
+    sccVision.vTarget = float(self.scc.vision.output_v_target)
+    sccVision.aTarget = float(self.scc.vision.output_a_target)
+    sccVision.currentLateralAccel = float(self.scc.vision.current_lat_acc)
+    sccVision.maxPredictedLateralAccel = float(self.scc.vision.max_pred_lat_acc)
+    sccVision.enabled = self.scc.vision.is_enabled
+    sccVision.active = self.scc.vision.is_active
 
     pm.send('longitudinalPlanSP', plan_sp_send)

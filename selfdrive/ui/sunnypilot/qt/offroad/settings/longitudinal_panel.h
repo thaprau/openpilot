@@ -9,8 +9,6 @@
 
 #include "selfdrive/ui/sunnypilot/ui.h"
 #include "selfdrive/ui/sunnypilot/qt/offroad/settings/longitudinal/custom_acc_increment.h"
-#include "selfdrive/ui/sunnypilot/qt/offroad/settings/longitudinal/slc/speed_limit_control.h"
-#include "selfdrive/ui/sunnypilot/qt/offroad/settings/longitudinal/slc/speed_limit_control_subpanel.h"
 #include "selfdrive/ui/sunnypilot/qt/offroad/settings/longitudinal/dec_controller.h"
 #include "selfdrive/ui/sunnypilot/qt/offroad/settings/settings.h"
 #include "selfdrive/ui/sunnypilot/qt/widgets/scrollview.h"
@@ -33,12 +31,9 @@ private:
   ScrollViewSP *cruisePanelScroller = nullptr;
   QWidget *cruisePanelScreen = nullptr;
   CustomAccIncrement *customAccIncrement = nullptr;
-
-  SpeedLimitControlSubpanel *slcScreen;
-  SpeedLimitControl *slcControl;
+  ParamControl *SmartCruiseControlVision;
   DecControllerSubpanel *decScreen;
   ButtonControlSP *decManageBtn = nullptr;
-  ParamControlSP *visionTurnSpeedControl = nullptr;
   ParamControlSP *dynamicExperimentalControl = nullptr;
 
   ParamControlSP *vibePersonalityControl;
