@@ -122,9 +122,8 @@ struct ModelManagerSP @0xaedffd8f31e7b55d {
 
 struct LongitudinalPlanSP @0xf35cc4560bbf6ec2 {
   dec @0 :DynamicExperimentalControl;
-  events @1 :List(OnroadEventSP.Event);
-  slc @2 :SpeedLimitControl;
-  visionTurnSpeedControl @3 :VisionTurnSpeedControl;
+  longitudinalPlanSource @1 :LongitudinalPlanSource;
+  smartCruiseControl @2 :SmartCruiseControl;
   accelPersonality @4 :AccelerationPersonality;
 
   struct DynamicExperimentalControl {
@@ -138,43 +137,18 @@ struct LongitudinalPlanSP @0xf35cc4560bbf6ec2 {
     }
   }
 
-  struct VisionTurnSpeedControl {
-    state @0 :VisionTurnSpeedControlState;
-    velocity @1 :Float32;
-    currentLateralAccel @2 :Float32;
-    maxPredictedLateralAccel @3 :Float32;
-
-    enum VisionTurnSpeedControlState {
-      disabled @0; # No predicted substantial turn on vision range or feature disabled.
-      entering @1; # A substantial turn is predicted ahead, adapting speed to turn comfort levels.
-      turning @2; # Actively turning. Managing acceleration to provide a roll on turn feeling.
-      leaving @3; # Road ahead straightens. Start to allow positive acceleration.
-    }
+  struct SmartCruiseControl {
   }
 
-  struct SpeedLimitControl {
-    state @0 :SpeedLimitControlState;
-    enabled @1 :Bool;
-    active @2 :Bool;
-    speedLimit @3 :Float32;
-    speedLimitOffset @4 :Float32;
-    distToSpeedLimit @5 :Float32;
-  }
-
-  enum SpeedLimitControlState {
-    disabled @0;
-    inactive @1; # No speed limit set or not enabled by parameter.
-    preActive @2;
-    pending @3; # Awaiting new speed limit.
-    adapting @4; # Reducing speed to match new speed limit.
-    active @5; # Cruising at speed limit.
+  enum LongitudinalPlanSource {
+    cruise @0;
   }
 
   enum AccelerationPersonality {
-    sport @0;
-    normal @1;
-    eco @2;
-  }
+      sport @0;
+      normal @1;
+      eco @2;
+    }
 }
 
 struct OnroadEventSP @0xda96579883444c35 {
@@ -214,12 +188,8 @@ struct OnroadEventSP @0xda96579883444c35 {
     experimentalModeSwitched @14;
     wrongCarModeAlertOnly @15;
     pedalPressedAlertOnly @16;
-    speedLimitPreActive @17;
-    speedLimitActive @18;
-    speedLimitConfirmed @19;
-    speedLimitValueChange @20;
-    laneTurnLeft @21;
-    laneTurnRight @22;
+    laneTurnLeft @17;
+    laneTurnRight @18;
   }
 }
 
@@ -253,7 +223,7 @@ struct CarControlSP @0xa5cd762cd951a455 {
 
     valueDEPRECATED @1 :Text; # The data type change may cause issues with backwards compatibility.
   }
-  
+
   enum ParamType {
     string @0;
     bool @1;
@@ -308,7 +278,6 @@ struct BackupManagerSP @0xf98d843bfd7004a3 {
 }
 
 struct CarStateSP @0xb86e6369214c01c8 {
-  speedLimit @0 :Float32;  # m/s
 }
 
 struct LiveMapDataSP @0xf416ec09499d9d19 {
