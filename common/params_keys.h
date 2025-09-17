@@ -164,7 +164,6 @@ inline static std::unordered_map<std::string, ParamKeyAttributes> keys = {
     {"ShowAdvancedControls", {PERSISTENT | BACKUP, BOOL, "0"}},
     {"SmartCruiseControlVision", {PERSISTENT | BACKUP, BOOL, "0"}},
     {"StandstillTimer", {PERSISTENT | BACKUP, BOOL, "0"}},
-    {"VisionTurnSpeedControl", {PERSISTENT | BACKUP, BOOL, "0"}},
     {"VibePersonalityEnabled", {PERSISTENT | BACKUP, BOOL, "0"}},
     {"VibeAccelPersonalityEnabled", {PERSISTENT | BACKUP, BOOL, "0"}},
     {"VibeFollowPersonalityEnabled", {PERSISTENT | BACKUP, BOOL, "0"}},
@@ -252,14 +251,4 @@ inline static std::unordered_map<std::string, ParamKeyAttributes> keys = {
     {"OsmStateTitle", {PERSISTENT, STRING}},
     {"OsmWayTest", {PERSISTENT, STRING}},
     {"RoadName", {CLEAR_ON_ONROAD_TRANSITION, STRING}},
-
-    // Speed Limit Control
-    {"SpeedLimitControl", {PERSISTENT | BACKUP, BOOL, "0"}},
-    {"SpeedLimitControlPolicy", {PERSISTENT | BACKUP, INT, "3"}},
-    {"SpeedLimitEngageType", {PERSISTENT | BACKUP, INT, "0"}},
-    {"SpeedLimitOffsetType", {PERSISTENT | BACKUP, INT, "0"}},
-    {"SpeedLimitValueOffset", {PERSISTENT | BACKUP, INT, "0"}},
-    {"SpeedLimitWarningType", {PERSISTENT | BACKUP, INT, "0"}},
-    {"SpeedLimitWarningOffsetType", {PERSISTENT | BACKUP, INT, "0"}},
-    {"SpeedLimitWarningValueOffset", {PERSISTENT | BACKUP, INT, "0"}},
 };
