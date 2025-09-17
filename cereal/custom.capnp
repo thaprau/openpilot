@@ -124,7 +124,7 @@ struct LongitudinalPlanSP @0xf35cc4560bbf6ec2 {
   dec @0 :DynamicExperimentalControl;
   longitudinalPlanSource @1 :LongitudinalPlanSource;
   smartCruiseControl @2 :SmartCruiseControl;
-  accelPersonality @4 :AccelerationPersonality;
+  accelPersonality @3 :AccelerationPersonality;
 
   struct DynamicExperimentalControl {
     state @0 :DynamicExperimentalControlState;
