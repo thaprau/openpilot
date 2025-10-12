@@ -33,6 +33,8 @@
 #define SAFETY_PSA 31U
 #define SAFETY_RIVIAN 33U
 #define SAFETY_VOLKSWAGEN_MEB 34U
+#define SAFETY_MG 35U
+#define SAFETY_TESLA_LEGACY 36U
 
 #define GET_BIT(msg, b) ((bool)!!(((msg)->data[((b) / 8U)] >> ((b) % 8U)) & 0x1U))
 #define GET_FLAG(value, mask) (((__typeof__(mask))(value) & (mask)) == (mask)) // cppcheck-suppress misra-c2012-1.2; allow __typeof__
@@ -230,7 +232,9 @@ void update_sample(struct sample_t *sample, int sample_new);
 bool get_longitudinal_allowed(void);
 int ROUND(float val);
 void gen_crc_lookup_table_8(uint8_t poly, uint8_t crc_lut[]);
+#ifdef CANFD
 void gen_crc_lookup_table_16(uint16_t poly, uint16_t crc_lut[]);
+#endif
 bool steer_torque_cmd_checks(int desired_torque, int steer_req, const TorqueSteeringLimits limits);
 bool steer_angle_cmd_checks(int desired_angle, bool steer_control_enabled, const AngleSteeringLimits limits);
 bool steer_angle_cmd_checks_vm(int desired_angle, bool steer_control_enabled, const AngleSteeringLimits limits,
@@ -313,7 +317,6 @@ typedef struct {
 
 extern uint16_t current_safety_mode;
 extern uint16_t current_safety_param;
-extern int current_safety_param_sp;
 extern safety_config current_safety_config;
 
 int safety_fwd_hook(int bus_num, int addr);

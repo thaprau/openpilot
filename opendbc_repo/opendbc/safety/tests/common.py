@@ -10,8 +10,6 @@ from opendbc.can import CANPacker
 from opendbc.safety import ALTERNATIVE_EXPERIENCE
 from opendbc.safety.tests.libsafety import libsafety_py
 
-from opendbc.safety.tests.mads_common import MadsSafetyTestBase
-
 MAX_WRONG_COUNTERS = 5
 MAX_SAMPLE_VALS = 6
 VEHICLE_SPEED_FACTOR = 1000
@@ -896,12 +894,6 @@ class PandaSafetyTest(PandaSafetyTestBase):
               continue
             if {attr, current_test}.issubset({'TestHyundaiLongitudinalSafety', 'TestHyundaiLongitudinalSafetyCameraSCC', 'TestHyundaiSafetyFCEVLong'}):
               continue
-
-            base_tests = {'TestHyundaiLongitudinalSafety', 'TestHyundaiLongitudinalSafetyCameraSCC', 'TestHyundaiSafetyFCEVLong',
-                          'TestHyundaiLongitudinalESCCSafety'}
-            if any(attr.startswith(test) for test in base_tests) and any(current_test.startswith(test) for test in base_tests):
-              continue
-
             if {attr, current_test}.issubset({'TestVolkswagenMqbSafety', 'TestVolkswagenMqbStockSafety', 'TestVolkswagenMqbLongSafety'}):
               continue
 
@@ -945,7 +937,7 @@ class PandaSafetyTest(PandaSafetyTestBase):
 
 
 @add_regen_tests
-class PandaCarSafetyTest(PandaSafetyTest, MadsSafetyTestBase):
+class PandaCarSafetyTest(PandaSafetyTest):
   STANDSTILL_THRESHOLD: float = 0.0
   GAS_PRESSED_THRESHOLD = 0
   RELAY_MALFUNCTION_ADDRS: dict[int, tuple[int, ...]] | None = None
@@ -1129,8 +1121,6 @@ class PandaCarSafetyTest(PandaSafetyTest, MadsSafetyTestBase):
   def test_safety_tick(self):
     self.safety.set_timer(int(2e6))
     self.safety.set_controls_allowed(True)
-    self.safety.set_controls_allowed_lat(True)
     self.safety.safety_tick_current_safety_config()
     self.assertFalse(self.safety.get_controls_allowed())
-    self.assertFalse(self.safety.get_controls_allowed_lat())
     self.assertFalse(self.safety.safety_config_valid())

@@ -11,11 +11,13 @@
 #include "opendbc/safety/modes/honda.h"
 #include "opendbc/safety/modes/toyota.h"
 #include "opendbc/safety/modes/tesla.h"
+#include "opendbc/safety/modes/tesla_legacy.h"
 #include "opendbc/safety/modes/gm.h"
 #include "opendbc/safety/modes/ford.h"
 #include "opendbc/safety/modes/hyundai.h"
 #include "opendbc/safety/modes/chrysler.h"
 #include "opendbc/safety/modes/rivian.h"
+#include "opendbc/safety/modes/mg.h"
 #include "opendbc/safety/modes/subaru.h"
 #include "opendbc/safety/modes/subaru_preglobal.h"
 #include "opendbc/safety/modes/mazda.h"
@@ -25,7 +27,11 @@
 #include "opendbc/safety/modes/elm327.h"
 #include "opendbc/safety/modes/body.h"
 #include "opendbc/safety/modes/psa.h"
+
+// CAN-FD only safety modes
+#ifdef CANFD
 #include "opendbc/safety/modes/hyundai_canfd.h"
+#endif
 
 uint32_t GET_BYTES(const CANPacket_t *msg, int start, int len) {
   uint32_t ret = 0U;
@@ -84,7 +90,6 @@ uint32_t safety_mode_cnt = 0U;
 
 uint16_t current_safety_mode = SAFETY_SILENT;
 uint16_t current_safety_param = 0;
-int current_safety_param_sp = 0;
 static const safety_hooks *current_hooks = &nooutput_hooks;
 safety_config current_safety_config;
 
@@ -293,6 +298,7 @@ void gen_crc_lookup_table_8(uint8_t poly, uint8_t crc_lut[]) {
   }
 }
 
+#ifdef CANFD
 void gen_crc_lookup_table_16(uint16_t poly, uint16_t crc_lut[]) {
   for (uint16_t i = 0; i < 256U; i++) {
     uint16_t crc = i << 8U;
@@ -306,6 +312,7 @@ void gen_crc_lookup_table_16(uint16_t poly, uint16_t crc_lut[]) {
     crc_lut[i] = crc;
   }
 }
+#endif
 
 // 1Hz safety function called by main. Now just a check for lagging safety messages
 void safety_tick(const safety_config *cfg) {
@@ -323,7 +330,6 @@ void safety_tick(const safety_config *cfg) {
       cfg->rx_checks[i].status.lagging = lagging;
       if (lagging) {
         controls_allowed = false;
-        mads_exit_controls(MADS_DISENGAGE_REASON_LAG);
       }
 
       if (lagging || !is_msg_valid(cfg->rx_checks, i)) {
@@ -370,7 +376,6 @@ static void stock_ecu_check(bool stock_ecu_detected) {
   if ((safety_mode_cnt > RELAY_TRNS_TIMEOUT) && stock_ecu_detected) {
     relay_malfunction_set();
   }
-  mads_state_update(vehicle_moving, acc_main_on, controls_allowed, brake_pressed || regen_braking, steering_disengage);
 }
 
 static void relay_malfunction_reset(void) {
@@ -406,7 +411,11 @@ int set_safety_hooks(uint16_t mode, uint16_t param) {
     {SAFETY_FORD, &ford_hooks},
     {SAFETY_RIVIAN, &rivian_hooks},
     {SAFETY_TESLA, &tesla_hooks},
+    {SAFETY_MG, &mg_hooks},
+    {SAFETY_TESLA_LEGACY, &tesla_legacy_hooks},
+#ifdef CANFD
     {SAFETY_HYUNDAI_CANFD, &hyundai_canfd_hooks},
+#endif
 #ifdef ALLOW_DEBUG
     {SAFETY_PSA, &psa_hooks},
     {SAFETY_SUBARU_PREGLOBAL, &subaru_preglobal_hooks},

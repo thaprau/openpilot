@@ -32,7 +32,6 @@ static bool honda_fwd_brake = false;
 static bool honda_bosch_long = false;
 static bool honda_bosch_radarless = false;
 static bool honda_bosch_canfd = false;
-static bool honda_clarity = false;
 typedef enum {HONDA_NIDEC, HONDA_BOSCH} HondaHw;
 static HondaHw honda_hw = HONDA_NIDEC;
 
@@ -107,14 +106,6 @@ static void honda_rx_hook(const CANPacket_t *msg) {
   if (((msg->addr == 0x1A6U) || (msg->addr == 0x296U)) && (msg->bus == pt_bus)) {
     int button = (msg->data[0] & 0xE0U) >> 5;
 
-    int cruise_setting = (msg->data[(msg->addr == 0x296U) ? 0U : 5U] & 0x0CU) >> 2U;
-    if (cruise_setting == 1) {
-      mads_button_press = MADS_BUTTON_PRESSED;
-    } else if (cruise_setting == 0) {
-      mads_button_press = MADS_BUTTON_NOT_PRESSED;
-    } else {
-    }
-
     // enter controls on the falling edge of set or resume
     bool set = (button != HONDA_BTN_SET) && (cruise_button_prev == HONDA_BTN_SET);
     bool res = (button != HONDA_BTN_RESUME) && (cruise_button_prev == HONDA_BTN_RESUME);
@@ -157,10 +148,6 @@ static void honda_rx_hook(const CANPacket_t *msg) {
     if ((msg->bus == 2U) && (msg->addr == 0x1FAU)) {
       bool honda_stock_aeb = GET_BIT(msg, 29U);
       int honda_stock_brake = (msg->data[0] << 2) | (msg->data[1] >> 6);
-
-      if (honda_clarity) {
-        honda_stock_brake = (msg->data[6] << 2) | (msg->data[7] >> 6);
-      }
 
       // Forward AEB when stock braking is higher than openpilot braking
       // only stop forwarding when AEB event is over
@@ -213,11 +200,6 @@ static bool honda_tx_hook(const CANPacket_t *msg) {
   // BRAKE: safety check (nidec)
   if ((msg->addr == 0x1FAU) && (msg->bus == bus_pt)) {
     honda_brake = (msg->data[0] << 2) + ((msg->data[1] >> 6) & 0x3U);
-
-    if (honda_clarity) {
-      honda_brake = (msg->data[6] << 2) + ((msg->data[7] >> 6) & 0x3U);
-    }
-
     if (longitudinal_brake_checks(honda_brake, HONDA_NIDEC_LONG_LIMITS)) {
       tx = false;
     }
@@ -256,7 +238,7 @@ static bool honda_tx_hook(const CANPacket_t *msg) {
 
   // STEER: safety check
   if ((msg->addr == 0xE4U) || (msg->addr == 0x194U)) {
-    if (!(controls_allowed || mads_is_lateral_control_allowed_by_mads())) {
+    if (!controls_allowed) {
       bool steer_applied = msg->data[0] | msg->data[1];
       if (steer_applied) {
         tx = false;
@@ -299,8 +281,6 @@ static safety_config honda_nidec_init(uint16_t param) {
 
   const uint16_t HONDA_PARAM_NIDEC_ALT = 4;
 
-  const uint16_t HONDA_PARAM_SP_CLARITY = 1;
-
   honda_hw = HONDA_NIDEC;
   honda_brake = 0;
   honda_brake_switch_prev = false;
@@ -313,8 +293,6 @@ static safety_config honda_nidec_init(uint16_t param) {
   safety_config ret;
 
   bool enable_nidec_alt = GET_FLAG(param, HONDA_PARAM_NIDEC_ALT);
-
-  honda_clarity = GET_FLAG(current_safety_param_sp, HONDA_PARAM_SP_CLARITY);
 
   if (enable_nidec_alt) {
     // For Nidecs with main on signal on an alternate msg (missing 0x326)
