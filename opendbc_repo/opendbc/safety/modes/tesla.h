@@ -84,8 +84,8 @@ static bool tesla_get_quality_flag_valid(const CANPacket_t *msg) {
   if (msg->addr == 0x155U) {
     valid = (msg->data[5] & 0x1U) == 0x1U;  // ESP_wheelSpeedsQF
   } else if (msg->addr == 0x145U) {
-    int user_brake_status = (msg->data[3] >> 5) & 0x03U;
-    valid = (user_brake_status != 0) && (user_brake_status != 3);  // ESP_driverBrakeApply=NOT_INIT_OR_OFF, FAULT
+    int user_brake_status = (msg->data[3] & 0x60U) >> 5;
+    valid = (user_brake_status != 0) && (user_brake_status != 3);  // ESP_driverBrakeApply=NotInit_orOff, Faulty_SNA
   } else {
   }
   return valid;
@@ -129,7 +129,7 @@ static void tesla_rx_hook(const CANPacket_t *msg) {
 
     // Brake pressed
     if (msg->addr == 0x145U) {
-      brake_pressed = ((msg->data[3] >> 5) & 0x03U) == 2U;
+      brake_pressed = ((msg->data[3] & 0x60U) >> 5) == 2U;
     }
 
     // Cruise and Autopark/Summon state
@@ -158,11 +158,8 @@ static void tesla_rx_hook(const CANPacket_t *msg) {
                             (cruise_state == 7);    // PRE_CANCEL
       cruise_engaged = cruise_engaged && !tesla_autopark;
 
+      vehicle_moving = cruise_state != 3; // STANDSTILL
       pcm_cruise_check(cruise_engaged);
-    }
-
-    if (msg->addr == 0x155U) {
-      vehicle_moving = !GET_BIT(msg, 41U);  // ESP_vehicleStandstillSts
     }
   }
 
@@ -179,7 +176,7 @@ static void tesla_rx_hook(const CANPacket_t *msg) {
       bool tesla_stock_lkas_now = steering_control_type == 2;  // "LANE_KEEP_ASSIST"
 
       // Only consider rising edges while controls are not allowed
-      if (tesla_stock_lkas_now && !tesla_stock_lkas_prev && !controls_allowed && !m_mads_state.system_enabled) {
+      if (tesla_stock_lkas_now && !tesla_stock_lkas_prev && !controls_allowed) {
         tesla_stock_lkas = true;
       }
       if (!tesla_stock_lkas_now) {
@@ -225,16 +222,14 @@ static bool tesla_tx_hook(const CANPacket_t *msg) {
     int raw_angle_can = ((msg->data[0] & 0x7FU) << 8) | msg->data[1];
     int desired_angle = raw_angle_can - 16384;
     int steer_control_type = msg->data[2] >> 6;
-    bool steer_control_enabled = (steer_control_type == 1) ||  // ANGLE_CONTROL
-                                 (steer_control_type == 2);    // LANE_KEEP_ASSIST
+    bool steer_control_enabled = steer_control_type == 1;  // ANGLE_CONTROL
 
     if (steer_angle_cmd_checks_vm(desired_angle, steer_control_enabled, TESLA_STEERING_LIMITS, TESLA_STEERING_PARAMS)) {
       violation = true;
     }
 
     bool valid_steer_control_type = (steer_control_type == 0) ||  // NONE
-                                    (steer_control_type == 1) ||  // ANGLE_CONTROL
-                                    (steer_control_type == 2);    // LANE_KEEP_ASSIST
+                                    (steer_control_type == 1);    // ANGLE_CONTROL
     if (!valid_steer_control_type) {
       violation = true;
     }
@@ -351,7 +346,7 @@ static safety_config tesla_init(uint16_t param) {
     {.msg = {{0x155, 0, 8, 50U, .max_counter = 15U}, { 0 }, { 0 }}},                                // ESP_B (2nd speed in kph)
     {.msg = {{0x370, 0, 8, 100U, .max_counter = 15U, .ignore_quality_flag = true}, { 0 }, { 0 }}},  // EPAS3S_sysStatus (steering angle)
     {.msg = {{0x118, 0, 8, 100U, .max_counter = 15U, .ignore_quality_flag = true}, { 0 }, { 0 }}},  // DI_systemStatus (gas pedal)
-    {.msg = {{0x145, 0, 5, 25U, .max_counter = 15U}, { 0 }, { 0 }}},                                // ESP_status (brakes)
+    {.msg = {{0x145, 0, 8, 50U, .max_counter = 15U}, { 0 }, { 0 }}},                                // ESP_status (brakes)
     {.msg = {{0x286, 0, 8, 10U, .max_counter = 15U, .ignore_quality_flag = true}, { 0 }, { 0 }}},   // DI_state (acc state)
     {.msg = {{0x311, 0, 7, 10U, .max_counter = 15U, .ignore_quality_flag = true}, { 0 }, { 0 }}},   // UI_warning (blinkers, buckle switch & doors)
   };
