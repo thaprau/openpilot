@@ -60,6 +60,12 @@ class CAR(Platforms):
     [TeslaCarDocsHW4("Tesla Model X (with HW4) 2024")],
     CarSpecs(mass=2495., wheelbase=2.960, steerRatio=12.0),
   )
+  TESLA_MODEL_Y_JUNIPER = TeslaPlatformConfig(
+    [
+      TeslaCarDocsHW4("Tesla Model Y JUNIPER (with HW4) 2025-26"),
+     ],
+    CarSpecs(mass=2072., wheelbase=2.890, steerRatio=12.0),
+  )
 
 
 FW_QUERY_CONFIG = FwQueryConfig(
