@@ -9,7 +9,7 @@ from openpilot.common.filter_simple import FirstOrderFilter
 from openpilot.common.realtime import DT_MDL
 from openpilot.selfdrive.modeld.constants import ModelConstants
 from openpilot.selfdrive.controls.lib.longcontrol import LongCtrlState
-from openpilot.selfdrive.controls.lib.longitudinal_mpc_lib.long_mpc import LongitudinalMpc, LongitudinalPlanSource
+from openpilot.selfdrive.controls.lib.longitudinal_mpc_lib.long_mpc import LongitudinalMpc, LongitudinalPlanSource, get_T_FOLLOW
 from openpilot.selfdrive.controls.lib.longitudinal_mpc_lib.long_mpc import T_IDXS as T_IDXS_MPC
 from openpilot.selfdrive.controls.lib.drive_helpers import CONTROL_N, get_accel_from_plan
 from openpilot.selfdrive.car.cruise import V_CRUISE_MAX, V_CRUISE_UNSET
@@ -22,6 +22,11 @@ A_CRUISE_MAX_BP = [0., 10.0, 25., 40.]
 CONTROL_N_T_IDX = ModelConstants.T_IDXS[:CONTROL_N]
 ALLOW_THROTTLE_THRESHOLD = 0.4
 MIN_ALLOW_THROTTLE_SPEED = 2.5
+LEAD_APPROACH_MIN_SPEED = 3.0
+LEAD_APPROACH_MIN_CLOSING_SPEED = 0.4
+LEAD_APPROACH_TTC = 12.0
+LEAD_APPROACH_T_FOLLOW_BUFFER = 0.4
+LEAD_APPROACH_MIN_DISTANCE = 12.0
 
 # Lookup table for turns
 _A_TOTAL_MAX_V = [1.7, 3.2]
@@ -45,6 +50,29 @@ def limit_accel_in_turns(v_ego, angle_steers, a_target, CP):
   a_x_allowed = math.sqrt(max(a_total_max ** 2 - a_y ** 2, 0.))
 
   return [a_target[0], min(a_target[1], a_x_allowed)]
+
+def limit_accel_for_lead_approach(v_ego, radar_state, personality, accel_limits, accel_coast):
+  if v_ego < LEAD_APPROACH_MIN_SPEED:
+    return accel_limits, False
+
+  t_follow = get_T_FOLLOW(personality)
+  no_accel_distance = max(LEAD_APPROACH_MIN_DISTANCE, v_ego * (t_follow + LEAD_APPROACH_T_FOLLOW_BUFFER))
+
+  # radarState also carries model-only leads on radarless cars, with lead.radar set to False.
+  for lead in (radar_state.leadOne, radar_state.leadTwo):
+    if not lead.status:
+      continue
+
+    closing_speed = -lead.vRel
+    if closing_speed < LEAD_APPROACH_MIN_CLOSING_SPEED:
+      continue
+
+    ttc = lead.dRel / closing_speed if closing_speed > 0.0 else math.inf
+    if lead.dRel <= no_accel_distance or ttc <= LEAD_APPROACH_TTC:
+      no_accel_limit = max(accel_limits[0], min(0.0, accel_coast))
+      return [accel_limits[0], min(accel_limits[1], no_accel_limit)], True
+
+  return accel_limits, False
 
 
 class LongitudinalPlanner(LongitudinalPlannerSP):
@@ -171,6 +199,8 @@ class LongitudinalPlanner(LongitudinalPlannerSP):
 
     for idx in range(2):
       accel_clip[idx] = np.clip(accel_clip[idx], self.prev_accel_clip[idx] - 0.05, self.prev_accel_clip[idx] + 0.05)
+    accel_clip, lead_approach_limited = limit_accel_for_lead_approach(v_ego, sm['radarState'], sm['selfdriveState'].personality, accel_clip, accel_coast)
+    self.allow_throttle = self.allow_throttle and not lead_approach_limited
     self.output_a_target = np.clip(output_a_target, accel_clip[0], accel_clip[1])
     self.prev_accel_clip = accel_clip
 
