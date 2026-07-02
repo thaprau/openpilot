@@ -23,10 +23,16 @@ CONTROL_N_T_IDX = ModelConstants.T_IDXS[:CONTROL_N]
 ALLOW_THROTTLE_THRESHOLD = 0.4
 MIN_ALLOW_THROTTLE_SPEED = 2.5
 LEAD_APPROACH_MIN_SPEED = 3.0
-LEAD_APPROACH_MIN_CLOSING_SPEED = 0.4
-LEAD_APPROACH_TTC = 12.0
-LEAD_APPROACH_T_FOLLOW_BUFFER = 0.4
+LEAD_APPROACH_MIN_CLOSING_SPEED = 0.3
+LEAD_APPROACH_TTC_START = 22.0
+LEAD_APPROACH_TTC_FULL = 8.0
+LEAD_APPROACH_T_FOLLOW_BUFFER = 0.6
 LEAD_APPROACH_MIN_DISTANCE = 12.0
+LEAD_APPROACH_MIN_DISTANCE_MARGIN = 12.0
+LEAD_APPROACH_DISTANCE_MARGIN_TIME = 8.0
+LEAD_APPROACH_RISK_FOR_COAST = 0.35
+LEAD_APPROACH_DECEL_MAX = 1.0
+LEAD_APPROACH_BRAKE_DISTANCE_FLOOR = 4.0
 
 # Lookup table for turns
 _A_TOTAL_MAX_V = [1.7, 3.2]
@@ -53,10 +59,11 @@ def limit_accel_in_turns(v_ego, angle_steers, a_target, CP):
 
 def limit_accel_for_lead_approach(v_ego, radar_state, personality, accel_limits, accel_coast):
   if v_ego < LEAD_APPROACH_MIN_SPEED:
-    return accel_limits, False
+    return accel_limits
 
   t_follow = get_T_FOLLOW(personality)
-  no_accel_distance = max(LEAD_APPROACH_MIN_DISTANCE, v_ego * (t_follow + LEAD_APPROACH_T_FOLLOW_BUFFER))
+  desired_distance = max(LEAD_APPROACH_MIN_DISTANCE, v_ego * (t_follow + LEAD_APPROACH_T_FOLLOW_BUFFER))
+  lead_accel_cap = accel_limits[1]
 
   # radarState also carries model-only leads on radarless cars, with lead.radar set to False.
   for lead in (radar_state.leadOne, radar_state.leadTwo):
@@ -68,11 +75,27 @@ def limit_accel_for_lead_approach(v_ego, radar_state, personality, accel_limits,
       continue
 
     ttc = lead.dRel / closing_speed if closing_speed > 0.0 else math.inf
-    if lead.dRel <= no_accel_distance or ttc <= LEAD_APPROACH_TTC:
-      no_accel_limit = max(accel_limits[0], min(0.0, accel_coast))
-      return [accel_limits[0], min(accel_limits[1], no_accel_limit)], True
+    ttc_risk = float(np.interp(ttc, [LEAD_APPROACH_TTC_FULL, LEAD_APPROACH_TTC_START], [1.0, 0.0]))
 
-  return accel_limits, False
+    distance_margin = max(LEAD_APPROACH_MIN_DISTANCE_MARGIN, closing_speed * LEAD_APPROACH_DISTANCE_MARGIN_TIME)
+    distance_error = lead.dRel - desired_distance
+    distance_risk = float(np.interp(distance_error, [0.0, distance_margin], [1.0, 0.0]))
+
+    risk = max(ttc_risk, distance_risk)
+    if risk <= 0.0:
+      continue
+
+    brake_distance = max(distance_error, LEAD_APPROACH_BRAKE_DISTANCE_FLOOR)
+    needed_decel = closing_speed**2 / (2.0 * brake_distance)
+    target_decel = min(max(needed_decel, risk * LEAD_APPROACH_DECEL_MAX), LEAD_APPROACH_DECEL_MAX)
+
+    coast_limit = max(accel_limits[0], min(0.0, accel_coast))
+    brake_limit = min(coast_limit, max(accel_limits[0], -target_decel))
+    cap = float(np.interp(risk, [0.0, LEAD_APPROACH_RISK_FOR_COAST, 1.0],
+                          [accel_limits[1], coast_limit, brake_limit]))
+    lead_accel_cap = min(lead_accel_cap, cap)
+
+  return [accel_limits[0], min(accel_limits[1], lead_accel_cap)]
 
 
 class LongitudinalPlanner(LongitudinalPlannerSP):
@@ -197,10 +220,9 @@ class LongitudinalPlanner(LongitudinalPlannerSP):
       output_a_target = output_a_target_mpc
       self.output_should_stop = output_should_stop_mpc
 
+    accel_clip = limit_accel_for_lead_approach(v_ego, sm['radarState'], sm['selfdriveState'].personality, accel_clip, accel_coast)
     for idx in range(2):
       accel_clip[idx] = np.clip(accel_clip[idx], self.prev_accel_clip[idx] - 0.05, self.prev_accel_clip[idx] + 0.05)
-    accel_clip, lead_approach_limited = limit_accel_for_lead_approach(v_ego, sm['radarState'], sm['selfdriveState'].personality, accel_clip, accel_coast)
-    self.allow_throttle = self.allow_throttle and not lead_approach_limited
     self.output_a_target = np.clip(output_a_target, accel_clip[0], accel_clip[1])
     self.prev_accel_clip = accel_clip
 
