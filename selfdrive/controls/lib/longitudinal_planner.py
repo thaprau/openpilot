@@ -23,15 +23,19 @@ CONTROL_N_T_IDX = ModelConstants.T_IDXS[:CONTROL_N]
 ALLOW_THROTTLE_THRESHOLD = 0.4
 MIN_ALLOW_THROTTLE_SPEED = 2.5
 LEAD_APPROACH_MIN_SPEED = 3.0
-LEAD_APPROACH_MIN_CLOSING_SPEED = 0.3
-LEAD_APPROACH_TTC_START = 22.0
-LEAD_APPROACH_TTC_FULL = 8.0
-LEAD_APPROACH_T_FOLLOW_BUFFER = 0.6
+LEAD_APPROACH_MIN_CLOSING_SPEED = 0.6
+LEAD_APPROACH_TTC_START = 20.0
+LEAD_APPROACH_TTC_FULL = 7.0
+LEAD_APPROACH_T_FOLLOW_BUFFER = 0.5
 LEAD_APPROACH_MIN_DISTANCE = 12.0
 LEAD_APPROACH_MIN_DISTANCE_MARGIN = 12.0
 LEAD_APPROACH_DISTANCE_MARGIN_TIME = 8.0
-LEAD_APPROACH_RISK_FOR_COAST = 0.35
-LEAD_APPROACH_DECEL_MAX = 1.0
+LEAD_APPROACH_RISK_FOR_HOLD = 0.35
+LEAD_APPROACH_HOLD_ACCEL = 0.05
+LEAD_APPROACH_BRAKE_START_CLOSING_SPEED = 1.2
+LEAD_APPROACH_BRAKE_FULL_CLOSING_SPEED = 3.0
+LEAD_APPROACH_DECEL_SCALE = 0.75
+LEAD_APPROACH_DECEL_MAX = 0.65
 LEAD_APPROACH_BRAKE_DISTANCE_FLOOR = 4.0
 
 # Lookup table for turns
@@ -57,7 +61,7 @@ def limit_accel_in_turns(v_ego, angle_steers, a_target, CP):
 
   return [a_target[0], min(a_target[1], a_x_allowed)]
 
-def limit_accel_for_lead_approach(v_ego, radar_state, personality, accel_limits, accel_coast):
+def limit_accel_for_lead_approach(v_ego, radar_state, personality, accel_limits, _accel_coast):
   if v_ego < LEAD_APPROACH_MIN_SPEED:
     return accel_limits
 
@@ -86,13 +90,16 @@ def limit_accel_for_lead_approach(v_ego, radar_state, personality, accel_limits,
       continue
 
     brake_distance = max(distance_error, LEAD_APPROACH_BRAKE_DISTANCE_FLOOR)
+    closing_brake_scale = float(np.interp(closing_speed,
+                                          [LEAD_APPROACH_BRAKE_START_CLOSING_SPEED, LEAD_APPROACH_BRAKE_FULL_CLOSING_SPEED],
+                                          [0.0, 1.0]))
     needed_decel = closing_speed**2 / (2.0 * brake_distance)
-    target_decel = min(max(needed_decel, risk * LEAD_APPROACH_DECEL_MAX), LEAD_APPROACH_DECEL_MAX)
+    target_decel = min(needed_decel * closing_brake_scale * LEAD_APPROACH_DECEL_SCALE, LEAD_APPROACH_DECEL_MAX)
 
-    coast_limit = max(accel_limits[0], min(0.0, accel_coast))
-    brake_limit = min(coast_limit, max(accel_limits[0], -target_decel))
-    cap = float(np.interp(risk, [0.0, LEAD_APPROACH_RISK_FOR_COAST, 1.0],
-                          [accel_limits[1], coast_limit, brake_limit]))
+    hold_limit = max(accel_limits[0], LEAD_APPROACH_HOLD_ACCEL)
+    brake_limit = min(hold_limit, max(accel_limits[0], -target_decel))
+    cap = float(np.interp(risk, [0.0, LEAD_APPROACH_RISK_FOR_HOLD, 1.0],
+                          [accel_limits[1], hold_limit, brake_limit]))
     lead_accel_cap = min(lead_accel_cap, cap)
 
   return [accel_limits[0], min(accel_limits[1], lead_accel_cap)]
