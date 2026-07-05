@@ -23,6 +23,7 @@ class CircularAlertsRenderer:
     self._e2e_alert_frame = 0
     self._green_light_alert = False
     self._lead_depart_alert = False
+    self._lead_approach_active = False
     self._standstill_elapsed_time = 0.0
     self._is_standstill = False
     self._alert_text = ""
@@ -35,6 +36,7 @@ class CircularAlertsRenderer:
     car_state = sm['carState']
     self._green_light_alert = lp_sp.e2eAlerts.greenLightAlert
     self._lead_depart_alert = lp_sp.e2eAlerts.leadDepartAlert
+    self._lead_approach_active = lp_sp.leadApproachActive
     self._is_standstill = car_state.standstill
 
     if not ui_state.started:
@@ -59,6 +61,11 @@ class CircularAlertsRenderer:
         self._alert_text = "LEAD VEHICLE\nDEPARTING"
         self._alert_img = self._lead_depart_alert_img
 
+    elif self._lead_approach_active:
+      self._alert_img = None
+      self._alert_text = "LEAD\nAPPROACH"
+      self._e2e_alert_frame += 1
+
     elif ui_state.standstill_timer and self._is_standstill:
       self._alert_img = None
       self._standstill_elapsed_time += 1.0 / gui_app.target_fps
@@ -73,7 +80,9 @@ class CircularAlertsRenderer:
         self._standstill_elapsed_time = 0.0
 
   def render(self, rect: rl.Rectangle) -> None:
-    if not self._allow_e2e_alerts or (self._e2e_alert_display_timer <= 0 and not (ui_state.standstill_timer and self._is_standstill)):
+    if not self._allow_e2e_alerts or (
+      self._e2e_alert_display_timer <= 0 and not self._lead_approach_active and not (ui_state.standstill_timer and self._is_standstill)
+    ):
       return
 
     e2e_alert_size = 250
@@ -89,8 +98,10 @@ class CircularAlertsRenderer:
     is_pulsing = (self._e2e_alert_frame % gui_app.target_fps) < (gui_app.target_fps / 2.5)
 
     # Standstill Timer (STOPPED) should be static white
-    if self._e2e_alert_display_timer == 0 and ui_state.standstill_timer and self._is_standstill:
+    if self._e2e_alert_display_timer == 0 and ui_state.standstill_timer and self._is_standstill and not self._lead_approach_active:
       frame_color = rl.Color(255, 255, 255, 75)
+    elif self._lead_approach_active:
+      frame_color = rl.Color(255, 255, 255, 75) if is_pulsing else rl.Color(255, 175, 3, 90)
     else:
       frame_color = rl.Color(255, 255, 255, 75) if is_pulsing else rl.Color(0, 255, 0, 75)
 
@@ -119,7 +130,20 @@ class CircularAlertsRenderer:
     # Draw lines upwards from bottom
     current_y = bottom_y - (len(lines) * text_size * FONT_SCALE)
 
-    if self._e2e_alert_display_timer == 0 and ui_state.standstill_timer and self._is_standstill:
+    if self._lead_approach_active:
+      alert_alt_text = "LEAD"
+      top_text_size = 100
+      measure_top = measure_text_cached(font, alert_alt_text, top_text_size, spacing)
+      top_y = alert_rect.y + alert_rect.height / 3.3
+      rl.draw_text_ex(font, alert_alt_text, rl.Vector2(center.x - measure_top.x / 2, top_y), top_text_size, spacing, rl.Color(255, 175, 3, 240))
+
+      alert_text = "APPROACH"
+      bottom_text_size = 64
+      measure_bottom = measure_text_cached(font, alert_text, bottom_text_size, spacing)
+      bottom_y = (alert_rect.y + alert_rect.height) - (alert_rect.height / 4.5) - measure_bottom.y
+      rl.draw_text_ex(font, alert_text, rl.Vector2(center.x - measure_bottom.x / 2, bottom_y), bottom_text_size, spacing, rl.WHITE)
+
+    elif self._e2e_alert_display_timer == 0 and ui_state.standstill_timer and self._is_standstill:
       # Standstill Timer Text
       alert_alt_text = "STOPPED"
       top_text_size = 80
