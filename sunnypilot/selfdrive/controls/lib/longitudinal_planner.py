@@ -32,6 +32,7 @@ class LongitudinalPlannerSP:
     self.generation = int(model_bundle.generation) if (model_bundle := get_active_bundle()) else None
     self.source = LongitudinalPlanSource.cruise
     self.e2e_alerts_helper = E2EAlertsHelper()
+    self.lead_approach_active = False
 
     self.output_v_target = 0.
     self.output_a_target = 0.
@@ -88,6 +89,7 @@ class LongitudinalPlannerSP:
     longitudinalPlanSP.vTarget = float(self.output_v_target)
     longitudinalPlanSP.aTarget = float(self.output_a_target)
     longitudinalPlanSP.events = self.events_sp.to_msg()
+    longitudinalPlanSP.leadApproachActive = bool(self.lead_approach_active)
 
     # Dynamic Experimental Control
     dec = longitudinalPlanSP.dec

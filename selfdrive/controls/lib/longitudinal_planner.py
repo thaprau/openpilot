@@ -63,7 +63,7 @@ def limit_accel_in_turns(v_ego, angle_steers, a_target, CP):
 
 def limit_accel_for_lead_approach(v_ego, radar_state, personality, accel_limits, _accel_coast):
   if v_ego < LEAD_APPROACH_MIN_SPEED:
-    return accel_limits
+    return accel_limits, False
 
   t_follow = get_T_FOLLOW(personality)
   desired_distance = max(LEAD_APPROACH_MIN_DISTANCE, v_ego * (t_follow + LEAD_APPROACH_T_FOLLOW_BUFFER))
@@ -102,7 +102,8 @@ def limit_accel_for_lead_approach(v_ego, radar_state, personality, accel_limits,
                           [accel_limits[1], hold_limit, brake_limit]))
     lead_accel_cap = min(lead_accel_cap, cap)
 
-  return [accel_limits[0], min(accel_limits[1], lead_accel_cap)]
+  lead_approach_active = lead_accel_cap < accel_limits[1] - 1e-3
+  return [accel_limits[0], min(accel_limits[1], lead_accel_cap)], lead_approach_active
 
 
 class LongitudinalPlanner(LongitudinalPlannerSP):
@@ -119,6 +120,7 @@ class LongitudinalPlanner(LongitudinalPlannerSP):
     self.prev_accel_clip = [ACCEL_MIN, ACCEL_MAX]
     self.output_a_target = 0.0
     self.output_should_stop = False
+    self.lead_approach_active = False
 
     self.v_desired_trajectory = np.zeros(CONTROL_N)
     self.a_desired_trajectory = np.zeros(CONTROL_N)
@@ -227,7 +229,7 @@ class LongitudinalPlanner(LongitudinalPlannerSP):
       output_a_target = output_a_target_mpc
       self.output_should_stop = output_should_stop_mpc
 
-    accel_clip = limit_accel_for_lead_approach(v_ego, sm['radarState'], sm['selfdriveState'].personality, accel_clip, accel_coast)
+    accel_clip, self.lead_approach_active = limit_accel_for_lead_approach(v_ego, sm['radarState'], sm['selfdriveState'].personality, accel_clip, accel_coast)
     for idx in range(2):
       accel_clip[idx] = np.clip(accel_clip[idx], self.prev_accel_clip[idx] - 0.05, self.prev_accel_clip[idx] + 0.05)
     self.output_a_target = np.clip(output_a_target, accel_clip[0], accel_clip[1])
