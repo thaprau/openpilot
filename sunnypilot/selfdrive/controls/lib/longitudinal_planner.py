@@ -89,7 +89,7 @@ class LongitudinalPlannerSP:
     longitudinalPlanSP.vTarget = float(self.output_v_target)
     longitudinalPlanSP.aTarget = float(self.output_a_target)
     longitudinalPlanSP.events = self.events_sp.to_msg()
-    longitudinalPlanSP.leadApproachActive = bool(self.lead_approach_active)
+    longitudinalPlanSP.leadApproachActive = True
 
     # Dynamic Experimental Control
     dec = longitudinalPlanSP.dec
