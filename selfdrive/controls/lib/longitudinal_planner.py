@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import math
 import numpy as np
+from types import SimpleNamespace
 
 import cereal.messaging as messaging
 from opendbc.car.interfaces import ACCEL_MIN, ACCEL_MAX
@@ -37,6 +38,9 @@ LEAD_APPROACH_BRAKE_FULL_CLOSING_SPEED = 3.0
 LEAD_APPROACH_DECEL_SCALE = 0.75
 LEAD_APPROACH_DECEL_MAX = 0.65
 LEAD_APPROACH_BRAKE_DISTANCE_FLOOR = 4.0
+LEAD_APPROACH_DISTANCE_FILTER_RC = 0.25
+LEAD_APPROACH_V_REL_FILTER_RC = 0.25
+LEAD_APPROACH_FILTER_RESET_DISTANCE = 10.0
 
 # Lookup table for turns
 _A_TOTAL_MAX_V = [1.7, 3.2]
@@ -121,6 +125,9 @@ class LongitudinalPlanner(LongitudinalPlannerSP):
     self.output_a_target = 0.0
     self.output_should_stop = False
     self.lead_approach_active = False
+    self.lead_approach_d_rel_filters = [FirstOrderFilter(0.0, LEAD_APPROACH_DISTANCE_FILTER_RC, self.dt, initialized=False) for _ in range(2)]
+    self.lead_approach_v_rel_filters = [FirstOrderFilter(0.0, LEAD_APPROACH_V_REL_FILTER_RC, self.dt, initialized=False) for _ in range(2)]
+    self.lead_approach_track_ids = [None, None]
 
     self.v_desired_trajectory = np.zeros(CONTROL_N)
     self.a_desired_trajectory = np.zeros(CONTROL_N)
@@ -145,6 +152,33 @@ class LongitudinalPlanner(LongitudinalPlannerSP):
     else:
       throttle_prob = 1.0
     return x, v, a, j, throttle_prob
+
+  def get_filtered_lead_approach_radar_state(self, radar_state):
+    filtered_leads = []
+    for idx, lead in enumerate((radar_state.leadOne, radar_state.leadTwo)):
+      d_rel_filter = self.lead_approach_d_rel_filters[idx]
+      v_rel_filter = self.lead_approach_v_rel_filters[idx]
+
+      if not lead.status:
+        d_rel_filter.initialized = False
+        v_rel_filter.initialized = False
+        self.lead_approach_track_ids[idx] = None
+        filtered_leads.append(SimpleNamespace(status=False, dRel=0.0, vRel=0.0))
+        continue
+
+      d_rel = max(0.0, float(lead.dRel))
+      v_rel = float(lead.vRel)
+      track_id = int(lead.radarTrackId)
+      track_changed = self.lead_approach_track_ids[idx] != track_id and track_id >= 0
+      distance_jump = d_rel_filter.initialized and abs(d_rel - d_rel_filter.x) > LEAD_APPROACH_FILTER_RESET_DISTANCE
+      if track_changed or distance_jump:
+        d_rel_filter.initialized = False
+        v_rel_filter.initialized = False
+
+      self.lead_approach_track_ids[idx] = track_id
+      filtered_leads.append(SimpleNamespace(status=True, dRel=d_rel_filter.update(d_rel), vRel=v_rel_filter.update(v_rel)))
+
+    return SimpleNamespace(leadOne=filtered_leads[0], leadTwo=filtered_leads[1])
 
   def update(self, sm):
     LongitudinalPlannerSP.update(self, sm)
@@ -229,7 +263,10 @@ class LongitudinalPlanner(LongitudinalPlannerSP):
       output_a_target = output_a_target_mpc
       self.output_should_stop = output_should_stop_mpc
 
-    accel_clip, self.lead_approach_active = limit_accel_for_lead_approach(v_ego, sm['radarState'], sm['selfdriveState'].personality, accel_clip, accel_coast)
+    lead_approach_radar_state = self.get_filtered_lead_approach_radar_state(sm['radarState'])
+    accel_clip, self.lead_approach_active = limit_accel_for_lead_approach(
+      v_ego, lead_approach_radar_state, sm['selfdriveState'].personality, accel_clip, accel_coast
+    )
     for idx in range(2):
       accel_clip[idx] = np.clip(accel_clip[idx], self.prev_accel_clip[idx] - 0.05, self.prev_accel_clip[idx] + 0.05)
     self.output_a_target = np.clip(output_a_target, accel_clip[0], accel_clip[1])
